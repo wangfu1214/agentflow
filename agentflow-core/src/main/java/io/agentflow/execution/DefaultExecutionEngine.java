@@ -1,10 +1,12 @@
 package io.agentflow.execution;
 
+import io.agentflow.execution.interceptor.ExecutionInterceptor;
 import io.agentflow.execution.lifecycle.ExecutionLifecycle;
 import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.result.ExecutionResultHandler;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,6 +22,8 @@ public class DefaultExecutionEngine implements ExecutionEngine {
     private final ExecutionContextFactory contextFactory;
 
     private final ExecutionLifecycle lifecycle;
+
+    private final List<ExecutionInterceptor> interceptors;
 
     public DefaultExecutionEngine(
             ExecutionPipeline pipeline,
@@ -41,6 +45,16 @@ public class DefaultExecutionEngine implements ExecutionEngine {
             ExecutionResultHandler resultHandler,
             ExecutionContextFactory contextFactory,
             ExecutionLifecycle lifecycle
+    ) {
+        this(pipeline, resultHandler, contextFactory, lifecycle, List.of());
+    }
+
+    public DefaultExecutionEngine(
+            ExecutionPipeline pipeline,
+            ExecutionResultHandler resultHandler,
+            ExecutionContextFactory contextFactory,
+            ExecutionLifecycle lifecycle,
+            List<ExecutionInterceptor> interceptors
     ) {
         this.pipeline = Objects.requireNonNull(
                 pipeline,
@@ -64,6 +78,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
                         lifecycle,
                         "lifecycle must not be null"
                 );
+        this.interceptors = interceptors;
     }
 
     @Override
@@ -83,7 +98,15 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
             lifecycle.beforeExecute(execution, context);
 
+            for (ExecutionInterceptor interceptor : interceptors) {
+                interceptor.before(execution, context);
+            }
+
             pipeline.execute(context);
+
+            for (ExecutionInterceptor interceptor : interceptors) {
+                interceptor.after(execution, context);
+            }
 
             ExecutionResult result = resultHandler.handler(context);
 
@@ -93,6 +116,14 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
             return result;
         } catch (RuntimeException exception) {
+            for(ExecutionInterceptor interceptor: interceptors){
+
+                interceptor.onError(
+                        execution,
+                        context,
+                        exception);
+
+            }
             lifecycle.onError(execution, context, exception);
             execution.fail();
             throw exception;
