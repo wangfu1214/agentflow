@@ -32,6 +32,11 @@ public class ModelExecutionStep implements ExecutionStep {
                         definition.input()
                 );
         ModelResponse response = modelInvoker.invoke(request);
+        if (response == null) {
+            throw new IllegalStateException(
+                    "modelInvoker returned null response"
+            );
+        }
         context.put(ExecutionContextKeys.MODEL_RESPONSE, response);
     }
 }
