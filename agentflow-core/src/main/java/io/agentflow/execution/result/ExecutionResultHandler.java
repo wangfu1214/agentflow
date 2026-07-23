@@ -5,5 +5,5 @@ import io.agentflow.execution.ExecutionResult;
 
 public interface ExecutionResultHandler {
 
-    ExecutionResult handler(ExecutionContext executionContext);
+    ExecutionResult handle(ExecutionContext executionContext);
 }

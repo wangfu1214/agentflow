@@ -4,21 +4,46 @@ import io.agentflow.execution.ExecutionContext;
 import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionResult;
 import io.agentflow.model.ModelResponse;
+import io.agentflow.model.invocation.ModelInvocation;
+import io.agentflow.model.invocation.ModelInvocationStatus;
 
-public class DefaultExecutionResultHandler implements ExecutionResultHandler {
+import java.util.Objects;
+
+/**
+ * Builds the final execution result from the completed
+ * model invocation.
+ */
+public final class DefaultExecutionResultHandler
+        implements ExecutionResultHandler {
+
     @Override
-    public ExecutionResult handler(ExecutionContext context) {
-        ModelResponse response =
-                (ModelResponse)
-                        context.get(ExecutionContextKeys.MODEL_RESPONSE);
+    public ExecutionResult handle(
+            ExecutionContext context
+    ) {
+        Objects.requireNonNull(
+                context,
+                "context must not be null"
+        );
 
+        Object value = context.get(
+                ExecutionContextKeys.MODEL_INVOCATION
+        );
 
-        if(response == null){
+        if (!(value instanceof ModelInvocation invocation)) {
             throw new IllegalStateException(
-                    "modelResponse not found"
+                    "modelInvocation not found"
             );
         }
 
+        if (invocation.status()
+                != ModelInvocationStatus.SUCCEEDED) {
+            throw new IllegalStateException(
+                    "modelInvocation has not succeeded"
+            );
+        }
+
+        ModelResponse response =
+                invocation.response();
 
         return ExecutionResult.of(
                 response.content()

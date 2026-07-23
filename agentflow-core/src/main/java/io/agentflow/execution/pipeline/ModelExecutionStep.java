@@ -7,13 +7,34 @@ import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
+import io.agentflow.model.invocation.ModelInvocation;
+import io.agentflow.model.invocation.ModelInvocationIdGenerator;
+import io.agentflow.model.invocation.UuidModelInvocationIdGenerator;
+
+import java.util.Objects;
 
 public class ModelExecutionStep implements ExecutionStep {
 
     private final ModelInvoker modelInvoker;
 
+    private final ModelInvocationIdGenerator idGenerator;
+
     public ModelExecutionStep(ModelInvoker modelInvoker) {
-        this.modelInvoker = modelInvoker;
+        this(modelInvoker, new UuidModelInvocationIdGenerator());
+    }
+
+    public ModelExecutionStep(
+            ModelInvoker modelInvoker,
+            ModelInvocationIdGenerator idGenerator
+    ) {
+        this.modelInvoker = Objects.requireNonNull(
+                modelInvoker,
+                "modelInvoker must not be null"
+        );
+        this.idGenerator = Objects.requireNonNull(
+                idGenerator,
+                "idGenerator must not be null"
+        );
     }
 
     @Override
@@ -31,12 +52,42 @@ public class ModelExecutionStep implements ExecutionStep {
                         definition.systemPrompt(),
                         definition.input()
                 );
-        ModelResponse response = modelInvoker.invoke(request);
-        if (response == null) {
-            throw new IllegalStateException(
-                    "modelInvoker returned null response"
-            );
+
+        ModelInvocation invocation =
+                new ModelInvocation(
+                        idGenerator.generate(),
+                        execution.id(),
+                        request
+                );
+
+        /*
+         * Put the invocation into the context before starting it.
+         * This ensures error handlers and interceptors can still
+         * inspect the invocation when model execution fails.
+         */
+        context.put(
+                ExecutionContextKeys.MODEL_INVOCATION,
+                invocation
+        );
+
+        invocation.start();
+
+        try {
+            ModelResponse modelResponse =
+                    modelInvoker.invoke(request);
+
+            if (modelResponse == null) {
+                throw new IllegalStateException(
+                        "modelInvoker returned null response"
+                );
+            }
+
+            invocation.succeed(modelResponse);
+
+        } catch (RuntimeException exception) {
+            invocation.fail(exception);
+            throw exception;
         }
-        context.put(ExecutionContextKeys.MODEL_RESPONSE, response);
+
     }
 }

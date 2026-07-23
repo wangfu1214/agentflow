@@ -48,7 +48,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
                 interceptor.after(execution, context);
             }
 
-            ExecutionResult result = environment.resultHandler().handler(context);
+            ExecutionResult result = environment.resultHandler().handle(context);
 
             environment.lifecycle().afterExecute(execution, context);
 
