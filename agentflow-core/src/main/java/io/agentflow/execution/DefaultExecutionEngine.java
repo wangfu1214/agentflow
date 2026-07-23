@@ -2,9 +2,6 @@ package io.agentflow.execution;
 
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.result.ExecutionResultHandler;
-import io.agentflow.model.ModelInvoker;
-import io.agentflow.model.ModelRequest;
-import io.agentflow.model.ModelResponse;
 
 import java.util.Objects;
 
@@ -18,12 +15,23 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
     private final ExecutionResultHandler resultHandler;
 
+    private final ExecutionContextFactory contextFactory;
+
     public DefaultExecutionEngine(
             ExecutionPipeline pipeline,
             ExecutionResultHandler resultHandler
     ) {
+        this(pipeline, resultHandler, new DefaultExecutionContextFactory());
+    }
+
+    public DefaultExecutionEngine(
+            ExecutionPipeline pipeline,
+            ExecutionResultHandler resultHandler,
+            ExecutionContextFactory contextFactory
+    ) {
         this.pipeline = pipeline;
         this.resultHandler = resultHandler;
+        this.contextFactory = contextFactory;
     }
 
     @Override
@@ -38,7 +46,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
         execution.start();
 
         try {
-            ExecutionContext context = new DefaultExecutionContext(execution);
+            ExecutionContext context = contextFactory.create(execution);
 
             pipeline.execute(context);
 
