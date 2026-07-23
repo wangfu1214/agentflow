@@ -1,5 +1,6 @@
 package io.agentflow.execution;
 
+import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
@@ -12,15 +13,12 @@ import java.util.Objects;
  */
 public class DefaultExecutionEngine implements ExecutionEngine {
 
-    private final ModelInvoker modelInvoker;
+    private final ExecutionPipeline pipeline;
 
     public DefaultExecutionEngine(
-            ModelInvoker modelInvoker
+            ExecutionPipeline pipeline
     ) {
-        this.modelInvoker = Objects.requireNonNull(
-                modelInvoker,
-                "modelInvoker must not be null"
-        );
+        this.pipeline = pipeline;
     }
 
     @Override
@@ -35,19 +33,11 @@ public class DefaultExecutionEngine implements ExecutionEngine {
         execution.start();
 
         try {
-            ExecutionDefinition definition =
-                    execution.definition();
+            ExecutionContext context = new DefaultExecutionContext(execution);
 
-            ModelRequest modelRequest =
-                    new ModelRequest(
-                            definition.systemPrompt(),
-                            definition.input()
-                    );
-
-            ModelResponse modelResponse =
-                    modelInvoker.invoke(modelRequest);
-
-            if (modelResponse == null) {
+            pipeline.execute(context);
+            ModelResponse response = (ModelResponse) context.get("response");
+            if (response == null) {
                 throw new IllegalStateException(
                         "modelInvoker returned null response"
                 );
@@ -55,9 +45,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
             execution.succeed();
 
-            return ExecutionResult.of(
-                    modelResponse.content()
-            );
+            return ExecutionResult.of(response.content());
         } catch (RuntimeException exception) {
             execution.fail();
             throw exception;

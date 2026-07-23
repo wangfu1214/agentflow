@@ -1,8 +1,13 @@
 package io.agentflow.execution;
 
+import io.agentflow.execution.pipeline.DefaultExecutionPipeline;
+import io.agentflow.execution.pipeline.ExecutionPipeline;
+import io.agentflow.execution.pipeline.ModelExecutionStep;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelResponse;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,10 +44,7 @@ public class DefaultExecutionEngineTest {
                         DEFINITION
                 );
 
-        ExecutionEngine engine =
-                new DefaultExecutionEngine(
-                        modelInvoker
-                );
+        ExecutionEngine engine = createEngine(modelInvoker);
 
         ExecutionResult result =
                 engine.execute(execution);
@@ -72,10 +74,7 @@ public class DefaultExecutionEngineTest {
                         DEFINITION
                 );
 
-        ExecutionEngine engine =
-                new DefaultExecutionEngine(
-                        modelInvoker
-                );
+        ExecutionEngine engine = createEngine(modelInvoker);
 
         RuntimeException thrown = assertThrows(
                 RuntimeException.class,
@@ -100,10 +99,7 @@ public class DefaultExecutionEngineTest {
                         DEFINITION
                 );
 
-        ExecutionEngine engine =
-                new DefaultExecutionEngine(
-                        modelInvoker
-                );
+        ExecutionEngine engine = createEngine(modelInvoker);
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
@@ -131,10 +127,7 @@ public class DefaultExecutionEngineTest {
                         DEFINITION
                 );
 
-        ExecutionEngine engine =
-                new DefaultExecutionEngine(
-                        modelInvoker
-                );
+        ExecutionEngine engine = createEngine(modelInvoker);
 
         engine.execute(execution);
 
@@ -150,6 +143,24 @@ public class DefaultExecutionEngineTest {
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
                 execution.status()
+        );
+    }
+
+    private ExecutionEngine createEngine(
+            ModelInvoker modelInvoker
+    ) {
+
+        ExecutionPipeline pipeline =
+                new DefaultExecutionPipeline(
+                        List.of(
+                                new ModelExecutionStep(
+                                        modelInvoker
+                                )
+                        )
+                );
+
+        return new DefaultExecutionEngine(
+                pipeline
         );
     }
 }
