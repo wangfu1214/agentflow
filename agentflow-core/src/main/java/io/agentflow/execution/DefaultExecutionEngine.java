@@ -1,6 +1,7 @@
 package io.agentflow.execution;
 
 import io.agentflow.execution.pipeline.ExecutionPipeline;
+import io.agentflow.execution.result.ExecutionResultHandler;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
@@ -15,10 +16,14 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
     private final ExecutionPipeline pipeline;
 
+    private final ExecutionResultHandler resultHandler;
+
     public DefaultExecutionEngine(
-            ExecutionPipeline pipeline
+            ExecutionPipeline pipeline,
+            ExecutionResultHandler resultHandler
     ) {
         this.pipeline = pipeline;
+        this.resultHandler = resultHandler;
     }
 
     @Override
@@ -36,16 +41,12 @@ public class DefaultExecutionEngine implements ExecutionEngine {
             ExecutionContext context = new DefaultExecutionContext(execution);
 
             pipeline.execute(context);
-            ModelResponse response = (ModelResponse) context.get("response");
-            if (response == null) {
-                throw new IllegalStateException(
-                        "modelInvoker returned null response"
-                );
-            }
+
+            ExecutionResult result = resultHandler.handler(context);
 
             execution.succeed();
 
-            return ExecutionResult.of(response.content());
+            return result;
         } catch (RuntimeException exception) {
             execution.fail();
             throw exception;

@@ -2,6 +2,7 @@ package io.agentflow.execution.pipeline;
 
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
+import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelRequest;
@@ -31,6 +32,6 @@ public class ModelExecutionStep implements ExecutionStep {
                         definition.input()
                 );
         ModelResponse response = modelInvoker.invoke(request);
-        context.put("response", response);
+        context.put(ExecutionContextKeys.MODEL_RESPONSE, response);
     }
 }

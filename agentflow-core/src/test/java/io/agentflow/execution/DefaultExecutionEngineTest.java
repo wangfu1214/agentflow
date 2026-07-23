@@ -3,6 +3,7 @@ package io.agentflow.execution;
 import io.agentflow.execution.pipeline.DefaultExecutionPipeline;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.pipeline.ModelExecutionStep;
+import io.agentflow.execution.result.DefaultExecutionResultHandler;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelResponse;
 import org.junit.jupiter.api.Test;
@@ -160,7 +161,8 @@ public class DefaultExecutionEngineTest {
                 );
 
         return new DefaultExecutionEngine(
-                pipeline
+                pipeline,
+                new DefaultExecutionResultHandler()
         );
     }
 }
