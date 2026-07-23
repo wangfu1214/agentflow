@@ -1,12 +1,8 @@
 package io.agentflow.execution;
 
+import io.agentflow.execution.environment.ExecutionEnvironment;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
-import io.agentflow.execution.lifecycle.ExecutionLifecycle;
-import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
-import io.agentflow.execution.pipeline.ExecutionPipeline;
-import io.agentflow.execution.result.ExecutionResultHandler;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -15,70 +11,14 @@ import java.util.Objects;
  */
 public class DefaultExecutionEngine implements ExecutionEngine {
 
-    private final ExecutionPipeline pipeline;
+    private final ExecutionEnvironment environment;
 
-    private final ExecutionResultHandler resultHandler;
-
-    private final ExecutionContextFactory contextFactory;
-
-    private final ExecutionLifecycle lifecycle;
-
-    private final List<ExecutionInterceptor> interceptors;
-
-    public DefaultExecutionEngine(
-            ExecutionPipeline pipeline,
-            ExecutionResultHandler resultHandler
-    ) {
-        this(pipeline, resultHandler, new DefaultExecutionContextFactory());
-    }
-
-    public DefaultExecutionEngine(
-            ExecutionPipeline pipeline,
-            ExecutionResultHandler resultHandler,
-            ExecutionContextFactory contextFactory
-    ) {
-        this(pipeline, resultHandler, contextFactory, new NoopExecutionLifecycle());
-    }
-
-    public DefaultExecutionEngine(
-            ExecutionPipeline pipeline,
-            ExecutionResultHandler resultHandler,
-            ExecutionContextFactory contextFactory,
-            ExecutionLifecycle lifecycle
-    ) {
-        this(pipeline, resultHandler, contextFactory, lifecycle, List.of());
-    }
-
-    public DefaultExecutionEngine(
-            ExecutionPipeline pipeline,
-            ExecutionResultHandler resultHandler,
-            ExecutionContextFactory contextFactory,
-            ExecutionLifecycle lifecycle,
-            List<ExecutionInterceptor> interceptors
-    ) {
-        this.pipeline = Objects.requireNonNull(
-                pipeline,
-                "pipeline must not be null"
-        );
-
-        this.resultHandler =
+    public DefaultExecutionEngine(ExecutionEnvironment environment) {
+        this.environment =
                 Objects.requireNonNull(
-                        resultHandler,
-                        "resultHandler must not be null"
+                        environment,
+                        "environment must not be null"
                 );
-
-        this.contextFactory =
-                Objects.requireNonNull(
-                        contextFactory,
-                        "contextFactory must not be null"
-                );
-
-        this.lifecycle =
-                Objects.requireNonNull(
-                        lifecycle,
-                        "lifecycle must not be null"
-                );
-        this.interceptors = interceptors;
     }
 
     @Override
@@ -90,33 +30,33 @@ public class DefaultExecutionEngine implements ExecutionEngine {
                 "execution must not be null"
         );
 
-        ExecutionContext context = contextFactory.create(execution);
+        ExecutionContext context = environment.contextFactory().create(execution);
 
         execution.start();
 
         try {
 
-            lifecycle.beforeExecute(execution, context);
+            environment.lifecycle().beforeExecute(execution, context);
 
-            for (ExecutionInterceptor interceptor : interceptors) {
+            for (ExecutionInterceptor interceptor : environment.interceptors()) {
                 interceptor.before(execution, context);
             }
 
-            pipeline.execute(context);
+            environment.pipeline().execute(context);
 
-            for (ExecutionInterceptor interceptor : interceptors) {
+            for (ExecutionInterceptor interceptor : environment.interceptors()) {
                 interceptor.after(execution, context);
             }
 
-            ExecutionResult result = resultHandler.handler(context);
+            ExecutionResult result = environment.resultHandler().handler(context);
 
-            lifecycle.afterExecute(execution, context);
+            environment.lifecycle().afterExecute(execution, context);
 
             execution.succeed();
 
             return result;
         } catch (RuntimeException exception) {
-            for(ExecutionInterceptor interceptor: interceptors){
+            for(ExecutionInterceptor interceptor: environment.interceptors()){
 
                 interceptor.onError(
                         execution,
@@ -124,7 +64,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
                         exception);
 
             }
-            lifecycle.onError(execution, context, exception);
+            environment.lifecycle().onError(execution, context, exception);
             execution.fail();
             throw exception;
         }
