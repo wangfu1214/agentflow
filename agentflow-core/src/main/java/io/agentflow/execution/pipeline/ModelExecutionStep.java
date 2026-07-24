@@ -2,7 +2,6 @@ package io.agentflow.execution.pipeline;
 
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
-import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelRequest;
@@ -65,10 +64,10 @@ public class ModelExecutionStep implements ExecutionStep {
          * This ensures error handlers and interceptors can still
          * inspect the invocation when model execution fails.
          */
-        context.put(
-                ExecutionContextKeys.MODEL_INVOCATION,
-                invocation
-        );
+        context.record()
+                .addModelInvocation(
+                        invocation
+                );
 
         invocation.start();
 

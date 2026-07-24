@@ -1,6 +1,6 @@
 package io.agentflow.execution;
 
-import io.agentflow.client.AgentRequest;
+import io.agentflow.execution.record.ExecutionRecord;
 
 public interface ExecutionContext {
 
@@ -9,6 +9,8 @@ public interface ExecutionContext {
     ExecutionStatus getStatus();
 
     void setStatus(ExecutionStatus state);
+
+    ExecutionRecord record();
 
     Object get(String key);
 

@@ -1,7 +1,6 @@
 package io.agentflow.execution.result;
 
 import io.agentflow.execution.ExecutionContext;
-import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionResult;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
@@ -25,14 +24,21 @@ public final class DefaultExecutionResultHandler
                 "context must not be null"
         );
 
-        Object value = context.get(
-                ExecutionContextKeys.MODEL_INVOCATION
-        );
+        ModelInvocation invocation;
 
-        if (!(value instanceof ModelInvocation invocation)) {
+        try {
+
+            invocation =
+                    context.record()
+                            .lastModelInvocation();
+
+        } catch (IllegalStateException exception) {
+
             throw new IllegalStateException(
-                    "modelInvocation not found"
+                    "modelInvocation not found",
+                    exception
             );
+
         }
 
         if (invocation.status()

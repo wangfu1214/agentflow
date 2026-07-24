@@ -1,6 +1,7 @@
 package io.agentflow.execution;
 
 import io.agentflow.client.AgentRequest;
+import io.agentflow.execution.record.ExecutionRecord;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +13,7 @@ public class DefaultExecutionContext implements ExecutionContext {
 
     private ExecutionStatus state;
 
+    private final ExecutionRecord record;
 
     private final Map<String,Object> attributes;
 
@@ -19,7 +21,7 @@ public class DefaultExecutionContext implements ExecutionContext {
         this.execution = execution;
         this.state = ExecutionStatus.CREATED;
         this.attributes = new HashMap<>();
-
+        this.record = new ExecutionRecord(execution.id());
     }
 
     @Override
@@ -35,6 +37,11 @@ public class DefaultExecutionContext implements ExecutionContext {
     @Override
     public void setStatus(ExecutionStatus state) {
         this.state = state;
+    }
+
+    @Override
+    public ExecutionRecord record() {
+        return record;
     }
 
     @Override

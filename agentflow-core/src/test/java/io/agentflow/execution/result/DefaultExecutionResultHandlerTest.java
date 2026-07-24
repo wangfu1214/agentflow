@@ -3,7 +3,6 @@ package io.agentflow.execution.result;
 import io.agentflow.execution.DefaultExecutionContext;
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
-import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionResult;
 import io.agentflow.model.ModelRequest;
@@ -53,10 +52,7 @@ class DefaultExecutionResultHandlerTest {
                 )
         );
 
-        context.put(
-                ExecutionContextKeys.MODEL_INVOCATION,
-                invocation
-        );
+        context.record().addModelInvocation(invocation);
 
         ExecutionResultHandler handler =
                 new DefaultExecutionResultHandler();

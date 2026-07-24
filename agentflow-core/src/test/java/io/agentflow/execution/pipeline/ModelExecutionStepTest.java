@@ -3,7 +3,6 @@ package io.agentflow.execution.pipeline;
 import io.agentflow.execution.DefaultExecutionContext;
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
-import io.agentflow.execution.ExecutionContextKeys;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
@@ -56,10 +55,7 @@ class ModelExecutionStepTest {
 
         step.execute(context);
 
-        ModelInvocation invocation =
-                (ModelInvocation) context.get(
-                        ExecutionContextKeys.MODEL_INVOCATION
-                );
+        ModelInvocation invocation = context.record().lastModelInvocation();
 
         assertEquals(
                 "invocation-001",
@@ -111,10 +107,8 @@ class ModelExecutionStepTest {
                         () -> step.execute(context)
                 );
 
-        ModelInvocation invocation =
-                (ModelInvocation) context.get(
-                        ExecutionContextKeys.MODEL_INVOCATION
-                );
+        ModelInvocation invocation = context.record().lastModelInvocation();
+
 
         assertEquals(modelFailure, thrown);
         assertEquals(
@@ -152,10 +146,7 @@ class ModelExecutionStepTest {
                         () -> step.execute(context)
                 );
 
-        ModelInvocation invocation =
-                (ModelInvocation) context.get(
-                        ExecutionContextKeys.MODEL_INVOCATION
-                );
+        ModelInvocation invocation = context.record().lastModelInvocation();
 
         assertEquals(
                 "modelInvoker returned null response",
