@@ -34,6 +34,8 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
         execution.start();
 
+        context.record().start();
+
         try {
 
             environment.lifecycle().beforeExecute(execution, context);
@@ -52,6 +54,8 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
             environment.lifecycle().afterExecute(execution, context);
 
+            context.record().complete();
+
             execution.succeed();
 
             return result;
@@ -65,6 +69,9 @@ public class DefaultExecutionEngine implements ExecutionEngine {
 
             }
             environment.lifecycle().onError(execution, context, exception);
+
+            context.record().fail();
+
             execution.fail();
             throw exception;
         }

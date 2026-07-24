@@ -1,15 +1,18 @@
 package io.agentflow.execution.record;
 
-import io.agentflow.model.ModelRequest;
-import io.agentflow.model.invocation.ModelInvocation;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 
 class ExecutionRecordTest {
 
+
     @Test
-    void shouldStoreModelInvocation() {
+    void shouldCreateRecordInCreatedStatus() {
+
 
         ExecutionRecord record =
                 new ExecutionRecord(
@@ -17,31 +20,114 @@ class ExecutionRecordTest {
                 );
 
 
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        new ModelRequest(
-                                "system",
-                                "input"
-                        )
+        assertEquals(
+                ExecutionRecordStatus.CREATED,
+                record.status()
+        );
+
+
+        assertNull(
+                record.startedAt()
+        );
+
+
+        assertNull(
+                record.completedAt()
+        );
+
+    }
+
+
+
+    @Test
+    void shouldCompleteLifecycle() {
+
+
+        ExecutionRecord record =
+                new ExecutionRecord(
+                        "execution-001"
                 );
 
 
-        record.addModelInvocation(
-                invocation
-        );
+        record.start();
 
 
-        assertEquals(
-                1,
-                record.modelInvocations().size()
-        );
+        record.complete();
+
 
 
         assertEquals(
-                invocation,
-                record.lastModelInvocation()
+                ExecutionRecordStatus.COMPLETED,
+                record.status()
         );
+
+
+        assertNotNull(
+                record.startedAt()
+        );
+
+
+        assertNotNull(
+                record.completedAt()
+        );
+
     }
+
+
+
+    @Test
+    void shouldFailLifecycle() {
+
+
+        ExecutionRecord record =
+                new ExecutionRecord(
+                        "execution-001"
+                );
+
+
+        record.start();
+
+
+        record.fail();
+
+
+
+        assertEquals(
+                ExecutionRecordStatus.FAILED,
+                record.status()
+        );
+
+
+        assertNotNull(
+                record.completedAt()
+        );
+
+    }
+
+
+
+    @Test
+    void shouldRejectCompleteBeforeStart() {
+
+
+        ExecutionRecord record =
+                new ExecutionRecord(
+                        "execution-001"
+                );
+
+
+        IllegalStateException exception =
+                assertThrows(
+                        IllegalStateException.class,
+                        record::complete
+                );
+
+
+        assertEquals(
+                "expected execution record status RUNNING but was CREATED",
+                exception.getMessage()
+        );
+
+    }
+
 }

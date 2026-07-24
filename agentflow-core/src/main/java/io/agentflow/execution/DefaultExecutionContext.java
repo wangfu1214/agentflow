@@ -1,6 +1,5 @@
 package io.agentflow.execution;
 
-import io.agentflow.client.AgentRequest;
 import io.agentflow.execution.record.ExecutionRecord;
 
 import java.util.HashMap;
