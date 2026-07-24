@@ -1,7 +1,7 @@
 package io.agentflow.execution;
 
 import io.agentflow.execution.environment.ExecutionEnvironment;
-import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.lifecycle.ExecutionLifecycleCoordinator;
 
 import java.util.Objects;
 
@@ -22,58 +22,17 @@ public class DefaultExecutionEngine implements ExecutionEngine {
     }
 
     @Override
-    public ExecutionResult execute(
-            Execution execution
-    ) {
+    public ExecutionResult execute(Execution execution) {
         Objects.requireNonNull(
                 execution,
-                "execution must not be null"
-        );
+                "execution must not be null");
 
         ExecutionContext context = environment.contextFactory().create(execution);
 
-        execution.start();
+        ExecutionLifecycleCoordinator coordinator = new ExecutionLifecycleCoordinator(
+                environment.lifecycle(),environment.interceptors(),
+                environment.pipeline(),environment.resultHandler());
 
-        context.record().start();
-
-        try {
-
-            environment.lifecycle().beforeExecute(execution, context);
-
-            for (ExecutionInterceptor interceptor : environment.interceptors()) {
-                interceptor.before(execution, context);
-            }
-
-            environment.pipeline().execute(context);
-
-            for (ExecutionInterceptor interceptor : environment.interceptors()) {
-                interceptor.after(execution, context);
-            }
-
-            ExecutionResult result = environment.resultHandler().handle(context);
-
-            environment.lifecycle().afterExecute(execution, context);
-
-            context.record().complete();
-
-            execution.succeed();
-
-            return result;
-        } catch (RuntimeException exception) {
-            for(ExecutionInterceptor interceptor: environment.interceptors()){
-
-                interceptor.onError(
-                        execution,
-                        context,
-                        exception);
-
-            }
-            environment.lifecycle().onError(execution, context, exception);
-
-            context.record().fail();
-
-            execution.fail();
-            throw exception;
-        }
+        return coordinator.execute(execution, context);
     }
 }
