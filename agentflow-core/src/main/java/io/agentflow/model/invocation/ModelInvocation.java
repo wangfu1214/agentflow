@@ -1,5 +1,8 @@
 package io.agentflow.model.invocation;
 
+import io.agentflow.execution.invocation.InvocationType;
+import io.agentflow.execution.invocation.RuntimeInvocation;
+import io.agentflow.execution.invocation.RuntimeInvocationStatus;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
 
@@ -9,7 +12,7 @@ import java.util.Objects;
  * Runtime entity representing one model invocation
  * within an execution.
  */
-public final class ModelInvocation {
+public final class ModelInvocation implements RuntimeInvocation {
 
     private final String id;
 
@@ -17,7 +20,7 @@ public final class ModelInvocation {
 
     private final ModelRequest request;
 
-    private ModelInvocationStatus status;
+    private RuntimeInvocationStatus status;
 
     private ModelResponse response;
 
@@ -37,13 +40,15 @@ public final class ModelInvocation {
                 request,
                 "request must not be null"
         );
-        this.status = ModelInvocationStatus.CREATED;
+        this.status = RuntimeInvocationStatus.CREATED;
     }
 
+    @Override
     public String id() {
         return id;
     }
 
+    @Override
     public String executionId() {
         return executionId;
     }
@@ -52,7 +57,8 @@ public final class ModelInvocation {
         return request;
     }
 
-    public ModelInvocationStatus status() {
+    @Override
+    public RuntimeInvocationStatus status() {
         return status;
     }
 
@@ -65,32 +71,39 @@ public final class ModelInvocation {
     }
 
     public void start() {
-        requireStatus(ModelInvocationStatus.CREATED);
-        status = ModelInvocationStatus.RUNNING;
+        requireStatus(RuntimeInvocationStatus.CREATED);
+        status = RuntimeInvocationStatus.RUNNING;
+    }
+
+    @Override
+    public InvocationType type(){
+
+        return InvocationType.MODEL;
+
     }
 
     public void succeed(ModelResponse response) {
-        requireStatus(ModelInvocationStatus.RUNNING);
+        requireStatus(RuntimeInvocationStatus.RUNNING);
 
         this.response = Objects.requireNonNull(
                 response,
                 "response must not be null"
         );
-        this.status = ModelInvocationStatus.SUCCEEDED;
+        this.status = RuntimeInvocationStatus.SUCCEEDED;
     }
 
     public void fail(RuntimeException failure) {
-        requireStatus(ModelInvocationStatus.RUNNING);
+        requireStatus(RuntimeInvocationStatus.RUNNING);
 
         this.failure = Objects.requireNonNull(
                 failure,
                 "failure must not be null"
         );
-        this.status = ModelInvocationStatus.FAILED;
+        this.status = RuntimeInvocationStatus.FAILED;
     }
 
     private void requireStatus(
-            ModelInvocationStatus expected
+            RuntimeInvocationStatus expected
     ) {
         if (status != expected) {
             throw new IllegalStateException(

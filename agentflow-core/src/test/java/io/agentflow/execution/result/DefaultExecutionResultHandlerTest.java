@@ -52,7 +52,7 @@ class DefaultExecutionResultHandlerTest {
                 )
         );
 
-        context.record().addModelInvocation(invocation);
+        context.record().addInvocation(invocation);
 
         ExecutionResultHandler handler =
                 new DefaultExecutionResultHandler();

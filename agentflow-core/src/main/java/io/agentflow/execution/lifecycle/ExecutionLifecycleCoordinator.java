@@ -76,19 +76,11 @@ public final class ExecutionLifecycleCoordinator {
 
         execution.start();
 
-
-        context.record()
-                .start();
-
-
         try {
-
-
             lifecycle.beforeExecute(
                     execution,
                     context
             );
-
 
             interceptorChain.before(execution, context);
 
@@ -106,9 +98,6 @@ public final class ExecutionLifecycleCoordinator {
                     context
             );
 
-            context.record()
-                    .complete();
-
             execution.succeed();
 
             return result;
@@ -122,15 +111,10 @@ public final class ExecutionLifecycleCoordinator {
                     exception
             );
 
-            context.record()
-                    .fail();
-
             execution.fail();
 
             throw exception;
-
         }
-
     }
 
 }

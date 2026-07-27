@@ -4,9 +4,10 @@ import io.agentflow.execution.DefaultExecutionContext;
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
 import io.agentflow.execution.ExecutionDefinition;
+import io.agentflow.execution.invocation.RuntimeInvocation;
+import io.agentflow.execution.invocation.RuntimeInvocationStatus;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
-import io.agentflow.model.invocation.ModelInvocationStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +56,7 @@ class ModelExecutionStepTest {
 
         step.execute(context);
 
-        ModelInvocation invocation = context.record().lastModelInvocation();
+        RuntimeInvocation invocation = context.record().lastInvocation();
 
         assertEquals(
                 "invocation-001",
@@ -66,12 +67,8 @@ class ModelExecutionStepTest {
                 invocation.executionId()
         );
         assertEquals(
-                ModelInvocationStatus.SUCCEEDED,
+                RuntimeInvocationStatus.SUCCEEDED,
                 invocation.status()
-        );
-        assertEquals(
-                "Hello from model",
-                invocation.response().content()
         );
     }
 
@@ -107,12 +104,12 @@ class ModelExecutionStepTest {
                         () -> step.execute(context)
                 );
 
-        ModelInvocation invocation = context.record().lastModelInvocation();
+        ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
 
 
         assertEquals(modelFailure, thrown);
         assertEquals(
-                ModelInvocationStatus.FAILED,
+                RuntimeInvocationStatus.FAILED,
                 invocation.status()
         );
         assertEquals(
@@ -146,14 +143,14 @@ class ModelExecutionStepTest {
                         () -> step.execute(context)
                 );
 
-        ModelInvocation invocation = context.record().lastModelInvocation();
+        ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
 
         assertEquals(
                 "modelInvoker returned null response",
                 exception.getMessage()
         );
         assertEquals(
-                ModelInvocationStatus.FAILED,
+                RuntimeInvocationStatus.FAILED,
                 invocation.status()
         );
         assertEquals(

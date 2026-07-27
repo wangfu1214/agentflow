@@ -65,7 +65,7 @@ public class ModelExecutionStep implements ExecutionStep {
          * inspect the invocation when model execution fails.
          */
         context.record()
-                .addModelInvocation(
+                .addInvocation(
                         invocation
                 );
 

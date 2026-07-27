@@ -2,9 +2,9 @@ package io.agentflow.execution.result;
 
 import io.agentflow.execution.ExecutionContext;
 import io.agentflow.execution.ExecutionResult;
+import io.agentflow.execution.invocation.RuntimeInvocation;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
-import io.agentflow.model.invocation.ModelInvocationStatus;
 
 import java.util.Objects;
 
@@ -16,21 +16,16 @@ public final class DefaultExecutionResultHandler
         implements ExecutionResultHandler {
 
     @Override
-    public ExecutionResult handle(
-            ExecutionContext context
-    ) {
-        Objects.requireNonNull(
-                context,
-                "context must not be null"
-        );
+    public ExecutionResult handle(ExecutionContext context) {
+        Objects.requireNonNull(context, "context must not be null");
 
-        ModelInvocation invocation;
+        RuntimeInvocation invocation;
 
         try {
 
             invocation =
                     context.record()
-                            .lastModelInvocation();
+                            .lastInvocation();
 
         } catch (IllegalStateException exception) {
 
@@ -41,15 +36,18 @@ public final class DefaultExecutionResultHandler
 
         }
 
-        if (invocation.status()
-                != ModelInvocationStatus.SUCCEEDED) {
+        if (!(invocation instanceof ModelInvocation modelInvocation)) {
+
             throw new IllegalStateException(
-                    "modelInvocation has not succeeded"
+                    "last invocation is not model invocation"
             );
+
         }
 
+
         ModelResponse response =
-                invocation.response();
+                modelInvocation.response();
+
 
         return ExecutionResult.of(
                 response.content()

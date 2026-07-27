@@ -1,5 +1,6 @@
 package io.agentflow.model.invocation;
 
+import io.agentflow.execution.invocation.RuntimeInvocationStatus;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class ModelInvocationTest {
                 invocation.request()
         );
         assertEquals(
-                ModelInvocationStatus.CREATED,
+                RuntimeInvocationStatus.CREATED,
                 invocation.status()
         );
         assertNull(invocation.response());
@@ -61,7 +62,7 @@ class ModelInvocationTest {
         invocation.succeed(response);
 
         assertEquals(
-                ModelInvocationStatus.SUCCEEDED,
+                RuntimeInvocationStatus.SUCCEEDED,
                 invocation.status()
         );
         assertEquals(
@@ -89,7 +90,7 @@ class ModelInvocationTest {
         invocation.fail(failure);
 
         assertEquals(
-                ModelInvocationStatus.FAILED,
+                RuntimeInvocationStatus.FAILED,
                 invocation.status()
         );
         assertEquals(
