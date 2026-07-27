@@ -2,6 +2,7 @@ package io.agentflow.execution.environment;
 
 import io.agentflow.execution.ExecutionContextFactory;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.lifecycle.ExecutionLifecycle;
 import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
@@ -20,8 +21,8 @@ public class DefaultExecutionEnvironmentBuilder implements ExecutionEnvironmentB
             new NoopExecutionLifecycle();
 
 
-    private List<ExecutionInterceptor> interceptors =
-            new ArrayList<>();
+    private ExecutionInterceptorChain interceptorChain =
+            new ExecutionInterceptorChain(List.of());
 
 
     private ExecutionPipeline pipeline;
@@ -34,7 +35,7 @@ public class DefaultExecutionEnvironmentBuilder implements ExecutionEnvironmentB
         return new DefaultExecutionEnvironment(
                 contextFactory,
                 lifecycle,
-                interceptors,
+                interceptorChain,
                 pipeline,
                 resultHandler
         );
@@ -54,7 +55,7 @@ public class DefaultExecutionEnvironmentBuilder implements ExecutionEnvironmentB
 
     @Override
     public ExecutionEnvironmentBuilder interceptors(List<ExecutionInterceptor> interceptors) {
-        this.interceptors = interceptors;
+        this.interceptorChain =     new ExecutionInterceptorChain(interceptors);
         return this;
     }
 

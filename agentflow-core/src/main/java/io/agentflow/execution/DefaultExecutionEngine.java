@@ -30,7 +30,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
         ExecutionContext context = environment.contextFactory().create(execution);
 
         ExecutionLifecycleCoordinator coordinator = new ExecutionLifecycleCoordinator(
-                environment.lifecycle(),environment.interceptors(),
+                environment.lifecycle(),environment.interceptorChain(),
                 environment.pipeline(),environment.resultHandler());
 
         return coordinator.execute(execution, context);

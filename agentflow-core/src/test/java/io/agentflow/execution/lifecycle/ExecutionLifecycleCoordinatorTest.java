@@ -3,6 +3,7 @@ package io.agentflow.execution.lifecycle;
 
 import io.agentflow.execution.*;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.result.ExecutionResultHandler;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ class ExecutionLifecycleCoordinatorTest {
         ExecutionLifecycleCoordinator coordinator =
                 new ExecutionLifecycleCoordinator(
                         lifecycle,
-                        List.of(),
+                        new ExecutionInterceptorChain(List.of()),
                         pipeline,
                         handler
                 );

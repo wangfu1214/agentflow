@@ -2,8 +2,8 @@ package io.agentflow.execution;
 
 import io.agentflow.execution.environment.DefaultExecutionEnvironment;
 import io.agentflow.execution.environment.ExecutionEnvironment;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.lifecycle.ExecutionLifecycle;
-import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
 import io.agentflow.execution.pipeline.DefaultExecutionPipeline;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.pipeline.ExecutionStep;
@@ -73,7 +73,7 @@ public class TestExecutionEngineFactory {
                 new DefaultExecutionEnvironment(
                         new DefaultExecutionContextFactory(),
                         lifecycle,
-                        List.of(),
+                        new ExecutionInterceptorChain(List.of()),
                         pipeline,
                         new DefaultExecutionResultHandler()
                 );

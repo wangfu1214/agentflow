@@ -2,6 +2,7 @@ package io.agentflow.execution.environment;
 
 import io.agentflow.execution.ExecutionContextFactory;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.lifecycle.ExecutionLifecycle;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 import io.agentflow.execution.result.ExecutionResultHandler;
@@ -17,7 +18,7 @@ public class DefaultExecutionEnvironment implements ExecutionEnvironment {
     private final ExecutionLifecycle lifecycle;
 
 
-    private final List<ExecutionInterceptor> interceptors;
+    private final ExecutionInterceptorChain interceptorChain;
 
 
     private final ExecutionPipeline pipeline;
@@ -28,7 +29,7 @@ public class DefaultExecutionEnvironment implements ExecutionEnvironment {
     public DefaultExecutionEnvironment(
             ExecutionContextFactory contextFactory,
             ExecutionLifecycle lifecycle,
-            List<ExecutionInterceptor> interceptors,
+            ExecutionInterceptorChain interceptorChain,
             ExecutionPipeline pipeline,
             ExecutionResultHandler resultHandler
     ) {
@@ -39,22 +40,17 @@ public class DefaultExecutionEnvironment implements ExecutionEnvironment {
                         "contextFactory must not be null"
                 );
 
-
         this.lifecycle =
                 Objects.requireNonNull(
                         lifecycle,
                         "lifecycle must not be null"
                 );
 
-
-        this.interceptors =
-                List.copyOf(
+        this.interceptorChain =
                         Objects.requireNonNull(
-                                interceptors,
-                                "interceptors must not be null"
-                        )
-                );
-
+                                interceptorChain,
+                                "interceptorChain must not be null"
+                        );
 
         this.pipeline =
                 Objects.requireNonNull(
@@ -81,11 +77,6 @@ public class DefaultExecutionEnvironment implements ExecutionEnvironment {
     }
 
     @Override
-    public List<ExecutionInterceptor> interceptors() {
-        return interceptors;
-    }
-
-    @Override
     public ExecutionPipeline pipeline() {
         return pipeline;
     }
@@ -93,5 +84,10 @@ public class DefaultExecutionEnvironment implements ExecutionEnvironment {
     @Override
     public ExecutionResultHandler resultHandler() {
         return resultHandler;
+    }
+
+    @Override
+    public ExecutionInterceptorChain interceptorChain() {
+        return interceptorChain;
     }
 }

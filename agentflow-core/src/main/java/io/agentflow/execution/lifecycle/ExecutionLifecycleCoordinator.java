@@ -5,6 +5,7 @@ import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
 import io.agentflow.execution.ExecutionResult;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.result.ExecutionResultHandler;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
 
@@ -22,7 +23,7 @@ public final class ExecutionLifecycleCoordinator {
     private final ExecutionLifecycle lifecycle;
 
 
-    private final List<ExecutionInterceptor> interceptors;
+    private final ExecutionInterceptorChain interceptorChain;
 
 
     private final ExecutionPipeline pipeline;
@@ -34,7 +35,7 @@ public final class ExecutionLifecycleCoordinator {
 
     public ExecutionLifecycleCoordinator(
             ExecutionLifecycle lifecycle,
-            List<ExecutionInterceptor> interceptors,
+            ExecutionInterceptorChain interceptorChain,
             ExecutionPipeline pipeline,
             ExecutionResultHandler resultHandler
     ) {
@@ -46,13 +47,9 @@ public final class ExecutionLifecycleCoordinator {
                 );
 
 
-        this.interceptors =
-                List.copyOf(
-                        Objects.requireNonNull(
-                                interceptors,
-                                "interceptors must not be null"
-                        )
-                );
+        this.interceptorChain =
+                Objects.requireNonNull(interceptorChain,
+                        "interceptorChain must not be null");
 
 
         this.pipeline =
@@ -93,75 +90,31 @@ public final class ExecutionLifecycleCoordinator {
             );
 
 
-            for(
-                    ExecutionInterceptor interceptor :
-                    interceptors
-            ) {
-
-                interceptor.before(
-                        execution,
-                        context
-                );
-
-            }
-
+            interceptorChain.before(execution, context);
 
             pipeline.execute(context);
 
-
-
-            for(
-                    ExecutionInterceptor interceptor :
-                    interceptors
-            ) {
-
-                interceptor.after(
-                        execution,
-                        context
-                );
-
-            }
-
-
+            interceptorChain.after(execution, context);
 
             ExecutionResult result =
                     resultHandler.handle(
                             context
                     );
 
-
             lifecycle.afterExecute(
                     execution,
                     context
             );
 
-
             context.record()
                     .complete();
 
-
             execution.succeed();
 
-
             return result;
-
-
         } catch(RuntimeException exception) {
 
-
-            for(
-                    ExecutionInterceptor interceptor :
-                    interceptors
-            ) {
-
-                interceptor.onError(
-                        execution,
-                        context,
-                        exception
-                );
-
-            }
-
+            interceptorChain.onError(execution, context, exception);
 
             lifecycle.onError(
                     execution,
@@ -169,13 +122,10 @@ public final class ExecutionLifecycleCoordinator {
                     exception
             );
 
-
             context.record()
                     .fail();
 
-
             execution.fail();
-
 
             throw exception;
 

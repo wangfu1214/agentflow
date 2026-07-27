@@ -144,7 +144,6 @@ public class DefaultExecutionLifecycleTest {
 
         }
 
-
         assertTrue(
                 errorCalled.get()
         );

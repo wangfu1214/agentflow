@@ -3,6 +3,7 @@ package io.agentflow.execution;
 import io.agentflow.execution.environment.DefaultExecutionEnvironment;
 import io.agentflow.execution.environment.ExecutionEnvironment;
 import io.agentflow.execution.interceptor.ExecutionInterceptor;
+import io.agentflow.execution.interceptor.ExecutionInterceptorChain;
 import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
 import io.agentflow.execution.pipeline.DefaultExecutionPipeline;
 import io.agentflow.execution.pipeline.ExecutionPipeline;
@@ -167,7 +168,7 @@ public class DefaultExecutionEngineTest {
                 new DefaultExecutionEnvironment(
                         new DefaultExecutionContextFactory(),
                         new NoopExecutionLifecycle(),
-                        List.of(new ExecutionInterceptor[]{}),
+                        new ExecutionInterceptorChain(List.of()),
                         pipeline,
                         new DefaultExecutionResultHandler()
                 );
