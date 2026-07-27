@@ -20,63 +20,25 @@ public class TestExecutionEngineFactory {
 
     }
 
-
-    public static ExecutionEngine create(
-            ExecutionLifecycle lifecycle
-    ) {
-
+    public static ExecutionEngine create(ExecutionLifecycle lifecycle) {
         ModelInvoker modelInvoker =
                 request ->
-                        ModelResponse.of(
-                                "success"
-                        );
+                        ModelResponse.of("success");
 
-
-        return create(
-                lifecycle,
-                new ModelExecutionStep(
-                        modelInvoker
-                )
-        );
+        return create(lifecycle, new ModelExecutionStep(modelInvoker));
     }
 
-
-
-    public static ExecutionEngine create(
-            ExecutionLifecycle lifecycle,
-            ModelInvoker modelInvoker
-    ) {
-
-
-        return create(
-                lifecycle,
-                new ModelExecutionStep(
-                        modelInvoker
-                )
-        );
+    public static ExecutionEngine create(ExecutionLifecycle lifecycle, ModelInvoker modelInvoker) {
+        return create(lifecycle, new ModelExecutionStep(modelInvoker));
     }
 
+    private static ExecutionEngine create(ExecutionLifecycle lifecycle, ExecutionStep step) {
 
-
-    private static ExecutionEngine create(
-            ExecutionLifecycle lifecycle,
-            ExecutionStep step
-    ) {
-
-
-        ExecutionPipeline pipeline =
-                new DefaultExecutionPipeline(
-                        List.of(step)
-                );
+        ExecutionPipeline pipeline = new DefaultExecutionPipeline(List.of(step));
 
         ExecutionEnvironment environment =
-                new DefaultExecutionEnvironment(
-                        new DefaultExecutionContextFactory(),
-                        lifecycle,
-                        new ExecutionInterceptorChain(List.of()),
-                        pipeline,
-                        new DefaultExecutionResultHandler()
-                );
+                new DefaultExecutionEnvironment(new DefaultExecutionContextFactory(), lifecycle,
+                        new ExecutionInterceptorChain(List.of()), pipeline, new DefaultExecutionResultHandler());
         return new DefaultExecutionEngine(environment);
     }
 }

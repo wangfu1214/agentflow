@@ -97,6 +97,20 @@ class RuntimeInvocationTest {
                         return RuntimeInvocationStatus.CREATED;
                     }
 
+                    @Override
+                    public void start() {
+
+                    }
+
+                    @Override
+                    public void succeed(Object result) {
+
+                    }
+
+                    @Override
+                    public void fail(Exception exception) {
+
+                    }
                 };
 
 

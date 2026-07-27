@@ -12,22 +12,9 @@ class ExecutionRecordTest {
 
     @Test
     void shouldCreateRecordInCreatedStatus() {
-
-
         ExecutionRecord record =
-                new ExecutionRecord(
-                        "execution-001"
-                );
-
-        assertEquals(
-                "execution-001",
-                record.executionId()
-        );
-
-
-        assertNotNull(
-                record.createdAt()
-        );
-
+                new ExecutionRecord("execution-001");
+        assertEquals("execution-001", record.executionId());
+        assertNotNull(record.createdAt());
     }
 }

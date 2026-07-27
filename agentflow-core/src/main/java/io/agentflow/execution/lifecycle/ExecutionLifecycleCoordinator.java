@@ -105,11 +105,7 @@ public final class ExecutionLifecycleCoordinator {
 
             interceptorChain.onError(execution, context, exception);
 
-            lifecycle.onError(
-                    execution,
-                    context,
-                    exception
-            );
+            lifecycle.onError(execution, context, exception);
 
             execution.fail();
 

@@ -1,5 +1,6 @@
 package io.agentflow.model.invocation;
 
+import io.agentflow.execution.invocation.RuntimeInvocation;
 import io.agentflow.execution.invocation.RuntimeInvocationStatus;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
@@ -59,7 +60,14 @@ class ModelInvocationTest {
                 ModelResponse.of("Hello");
 
         invocation.start();
-        invocation.succeed(response);
+        RuntimeInvocation runtimeInvocation = invocation;
+
+        runtimeInvocation.succeed(response);
+
+        assertEquals(
+                RuntimeInvocationStatus.SUCCEEDED,
+                runtimeInvocation.status()
+        );
 
         assertEquals(
                 RuntimeInvocationStatus.SUCCEEDED,
@@ -146,5 +154,49 @@ class ModelInvocationTest {
                         + "CREATED but was RUNNING",
                 exception.getMessage()
         );
+    }
+
+    @Test
+    void shouldSupportRuntimeInvocationLifecycle() {
+
+        ModelInvocation invocation =
+                new ModelInvocation(
+                        "invocation-001",
+                        "execution-001",
+                        REQUEST
+                );
+
+
+        invocation.start();
+
+
+        assertEquals(
+                RuntimeInvocationStatus.RUNNING,
+                invocation.status()
+        );
+
+
+        RuntimeException exception =
+                new RuntimeException(
+                        "model failed"
+                );
+
+
+        invocation.fail(
+                exception
+        );
+
+
+        assertEquals(
+                RuntimeInvocationStatus.FAILED,
+                invocation.status()
+        );
+
+
+        assertEquals(
+                exception,
+                invocation.failure()
+        );
+
     }
 }

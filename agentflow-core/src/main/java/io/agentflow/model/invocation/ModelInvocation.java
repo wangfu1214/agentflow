@@ -24,7 +24,7 @@ public final class ModelInvocation implements RuntimeInvocation {
 
     private ModelResponse response;
 
-    private RuntimeException failure;
+    private Exception failure;
 
     public ModelInvocation(
             String id,
@@ -66,70 +66,50 @@ public final class ModelInvocation implements RuntimeInvocation {
         return response;
     }
 
-    public RuntimeException failure() {
+    public Exception failure() {
         return failure;
     }
 
+    @Override
     public void start() {
         requireStatus(RuntimeInvocationStatus.CREATED);
         status = RuntimeInvocationStatus.RUNNING;
     }
 
     @Override
-    public InvocationType type(){
-
-        return InvocationType.MODEL;
-
-    }
-
-    public void succeed(ModelResponse response) {
+    public void fail(Exception exception) {
         requireStatus(RuntimeInvocationStatus.RUNNING);
-
-        this.response = Objects.requireNonNull(
-                response,
-                "response must not be null"
-        );
-        this.status = RuntimeInvocationStatus.SUCCEEDED;
-    }
-
-    public void fail(RuntimeException failure) {
-        requireStatus(RuntimeInvocationStatus.RUNNING);
-
-        this.failure = Objects.requireNonNull(
-                failure,
-                "failure must not be null"
-        );
+        this.failure = Objects.requireNonNull(exception, "failure must not be null");
         this.status = RuntimeInvocationStatus.FAILED;
     }
 
-    private void requireStatus(
-            RuntimeInvocationStatus expected
-    ) {
+    @Override
+    public InvocationType type(){
+        return InvocationType.MODEL;
+    }
+
+    @Override
+    public void succeed(Object result) {
+        requireStatus(RuntimeInvocationStatus.RUNNING);
+        this.response = (ModelResponse) result;
+        this.status = RuntimeInvocationStatus.SUCCEEDED;
+    }
+
+    private void requireStatus(RuntimeInvocationStatus expected) {
         if (status != expected) {
             throw new IllegalStateException(
                     "expected model invocation status "
                             + expected
                             + " but was "
-                            + status
-            );
+                            + status);
         }
     }
 
-    private static String requireNotBlank(
-            String value,
-            String fieldName
-    ) {
-        Objects.requireNonNull(
-                value,
-                fieldName + " must not be null"
-        );
-
+    private static String requireNotBlank(String value, String fieldName) {
+        Objects.requireNonNull(value, fieldName + " must not be null");
         if (value.isBlank()) {
-            throw new IllegalArgumentException(
-                    fieldName + " must not be blank"
-            );
+            throw new IllegalArgumentException(fieldName + " must not be blank");
         }
-
         return value;
     }
 }

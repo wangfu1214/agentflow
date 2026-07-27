@@ -36,4 +36,10 @@ public interface RuntimeInvocation {
      */
     RuntimeInvocationStatus status();
 
+    void start();
+
+    void succeed(Object result);
+
+    void fail(Exception exception);
+
 }

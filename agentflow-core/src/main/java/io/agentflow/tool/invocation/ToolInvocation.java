@@ -32,56 +32,22 @@ public final class ToolInvocation implements RuntimeInvocation {
     private Object result;
 
 
-    private RuntimeException failure;
+    private Exception failure;
 
 
 
-    public ToolInvocation(
-            String id,
-            String executionId,
-            String toolName,
-            Map<String,Object> arguments
-    ) {
-
-        this.id =
-                requireNotBlank(id, "id");
-
-
-        this.executionId =
-                requireNotBlank(
-                        executionId,
-                        "executionId"
-                );
-
-
-        this.toolName =
-                requireNotBlank(
-                        toolName,
-                        "toolName"
-                );
-
-
-        this.arguments =
-                Map.copyOf(
-                        Objects.requireNonNull(
-                                arguments,
-                                "arguments must not be null"
-                        )
-                );
-
-
-        this.status =
-                RuntimeInvocationStatus.CREATED;
-
+    public ToolInvocation(String id, String executionId, String toolName, Map<String,Object> arguments) {
+        this.id = requireNotBlank(id, "id");
+        this.executionId = requireNotBlank(executionId, "executionId");
+        this.toolName = requireNotBlank(toolName, "toolName");
+        this.arguments = Map.copyOf(
+                Objects.requireNonNull(arguments, "arguments must not be null"));
+        this.status = RuntimeInvocationStatus.CREATED;
     }
-
-
 
     public String id() {
         return id;
     }
-
-
 
     public String executionId() {
         return executionId;
@@ -92,37 +58,28 @@ public final class ToolInvocation implements RuntimeInvocation {
         return InvocationType.TOOL;
     }
 
-
     public String toolName() {
         return toolName;
     }
-
-
 
     public Map<String,Object> arguments() {
         return arguments;
     }
 
-
-
+    @Override
     public RuntimeInvocationStatus status() {
         return status;
     }
-
-
 
     public Object result() {
         return result;
     }
 
-
-
-    public RuntimeException failure() {
+    public Exception failure() {
         return failure;
     }
 
-
-
+    @Override
     public void start() {
 
         requireStatus(RuntimeInvocationStatus.CREATED);
@@ -130,8 +87,7 @@ public final class ToolInvocation implements RuntimeInvocation {
         status = RuntimeInvocationStatus.RUNNING;
     }
 
-
-
+    @Override
     public void succeed(Object result) {
 
         requireStatus(RuntimeInvocationStatus.RUNNING);
@@ -141,32 +97,25 @@ public final class ToolInvocation implements RuntimeInvocation {
         this.status = RuntimeInvocationStatus.SUCCEEDED;
     }
 
-
-
-    public void fail(RuntimeException failure) {
+    @Override
+    public void fail(Exception failure) {
 
         requireStatus(RuntimeInvocationStatus.RUNNING);
-
         this.failure =
                 Objects.requireNonNull(failure,
                         "failure must not be null");
-
         this.status = RuntimeInvocationStatus.FAILED;
     }
 
     private void requireStatus(RuntimeInvocationStatus expected) {
 
         if(status != expected){
-
             throw new IllegalStateException(
                     "expected tool invocation status "
                             + expected
                             + " but was "
-                            + status
-            );
-
+                            + status);
         }
-
     }
 
     private static String requireNotBlank(String value, String fieldName) {
@@ -175,10 +124,8 @@ public final class ToolInvocation implements RuntimeInvocation {
 
         if(value.isBlank()) {
             throw new IllegalArgumentException(
-                    fieldName + " must not be blank"
-            );
+                    fieldName + " must not be blank");
         }
-
         return value;
     }
 }

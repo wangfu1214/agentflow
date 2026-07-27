@@ -52,7 +52,7 @@ public final class ToolExecutionStep implements ExecutionStep {
                 .addInvocation(invocation);
 
         invocation.start();
-        
+
         try {
             Object result =
                     toolInvoker.invoke(toolDefinition, invocation.arguments());
