@@ -14,35 +14,17 @@ public record ExecutionDefinition( String agentName,
                                    String input) {
 
     public ExecutionDefinition {
-        agentName = requireNotBlank(
-                agentName,
-                "agentName"
-        );
-        systemPrompt = requireNotBlank(
-                systemPrompt,
-                "systemPrompt"
-        );
-        input = requireNotBlank(
-                input,
-                "input"
-        );
+        agentName = requireNotBlank(agentName, "agentName");
+        systemPrompt = requireNotBlank(systemPrompt, "systemPrompt");
+        input = requireNotBlank(input, "input");
     }
 
-    private static String requireNotBlank(
-            String value,
-            String fieldName
-    ) {
-        Objects.requireNonNull(
-                value,
-                fieldName + " must not be null"
-        );
+    private static String requireNotBlank(String value, String fieldName) {
+        Objects.requireNonNull(value, fieldName + " must not be null");
 
         if (value.isBlank()) {
-            throw new IllegalArgumentException(
-                    fieldName + " must not be blank"
-            );
+            throw new IllegalArgumentException(fieldName + " must not be blank");
         }
-
         return value;
     }
 }

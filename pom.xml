@@ -16,6 +16,7 @@
 		<module>agentflow-core</module>
 		<module>agentflow-spring-boot-starter</module>
 		<module>agentflow-demo</module>
+		<module>agentflow-agent</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
