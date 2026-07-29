@@ -1,6 +1,5 @@
 package io.agentflow.client;
 
-import io.agentflow.agent.Agent;
 import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionFactory;
@@ -25,29 +24,8 @@ public final class DefaultExecutionFactory implements ExecutionFactory {
     }
 
     @Override
-    public Execution create(
-            Agent agent,
-            AgentRequest request
-    ) {
-        Objects.requireNonNull(
-                agent,
-                "agent must not be null"
-        );
-        Objects.requireNonNull(
-                request,
-                "request must not be null"
-        );
+    public Execution create(ExecutionDefinition definition) {
 
-        ExecutionDefinition definition =
-                new ExecutionDefinition(
-                        agent.name(),
-                        agent.systemPrompt(),
-                        request.input()
-                );
-
-        return new Execution(
-                idGenerator.generate(),
-                definition
-        );
+        return new Execution(idGenerator.generate(), definition);
     }
 }

@@ -8,8 +8,5 @@ import io.agentflow.client.AgentRequest;
  */
 public interface ExecutionFactory {
 
-    Execution create(
-            Agent agent,
-            AgentRequest request
-    );
+    Execution create(ExecutionDefinition definition);
 }

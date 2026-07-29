@@ -2,6 +2,7 @@ package io.agentflow.client;
 
 import io.agentflow.agent.Agent;
 import io.agentflow.execution.Execution;
+import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionStatus;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DefaultExecutionFactoryTest {
 
     @Test
-    void shouldCreateExecutionFromAgentAndRequest() {
+    void shouldCreateExecutionFromDefinition() {
         Agent agent = Agent.builder()
                 .name("assistant")
                 .systemPrompt("You are helpful.")
@@ -19,13 +20,16 @@ public class DefaultExecutionFactoryTest {
         AgentRequest request =
                 AgentRequest.of("Hello");
 
+        ExecutionDefinition definition = new ExecutionDefinition(
+                "assistant", "You are helpful.", "Hello");
+
         DefaultExecutionFactory factory =
                 new DefaultExecutionFactory(
                         () -> "execution-001"
                 );
 
         Execution execution =
-                factory.create(agent, request);
+                factory.create(definition);
 
         assertEquals(
                 "execution-001",
