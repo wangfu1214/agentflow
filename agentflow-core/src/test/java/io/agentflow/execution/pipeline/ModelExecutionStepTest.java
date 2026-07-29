@@ -19,40 +19,25 @@ class ModelExecutionStepTest {
             new ExecutionDefinition(
                     "assistant",
                     "You are helpful.",
-                    "Hello"
-            );
+                    "Hello");
 
     @Test
     void shouldCompleteModelInvocation() {
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
-
-        ExecutionContext context =
-                new DefaultExecutionContext(
-                        execution
-                );
-
+        Execution execution = new Execution("execution-001", DEFINITION);
+        ExecutionContext context = new DefaultExecutionContext(execution);
         ModelExecutionStep step =
                 new ModelExecutionStep(
                         request -> {
                             assertEquals(
                                     "You are helpful.",
-                                    request.systemPrompt()
-                            );
+                                    request.systemPrompt());
                             assertEquals(
                                     "Hello",
-                                    request.input()
-                            );
+                                    request.input());
 
-                            return ModelResponse.of(
-                                    "Hello from model"
-                            );
+                            return ModelResponse.of("Hello from model");
                         },
-                        () -> "invocation-001"
-                );
+                        () -> "invocation-001");
 
         step.execute(context);
 
@@ -60,102 +45,74 @@ class ModelExecutionStepTest {
 
         assertEquals(
                 "invocation-001",
-                invocation.id()
-        );
+                invocation.id());
         assertEquals(
                 "execution-001",
-                invocation.executionId()
-        );
+                invocation.executionId());
         assertEquals(
                 RuntimeInvocationStatus.SUCCEEDED,
-                invocation.status()
-        );
+                invocation.status());
     }
 
     @Test
     void shouldMarkInvocationFailedWhenModelFails() {
-        RuntimeException modelFailure =
-                new RuntimeException(
-                        "model unavailable"
-                );
+        RuntimeException modelFailure = new RuntimeException("model unavailable");
 
         Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+                new Execution("execution-001", DEFINITION);
 
-        ExecutionContext context =
-                new DefaultExecutionContext(
-                        execution
-                );
+        ExecutionContext context = new DefaultExecutionContext(execution);
 
         ModelExecutionStep step =
                 new ModelExecutionStep(
                         request -> {
                             throw modelFailure;
                         },
-                        () -> "invocation-001"
-                );
+                        () -> "invocation-001");
 
         RuntimeException thrown =
                 assertThrows(
                         RuntimeException.class,
-                        () -> step.execute(context)
-                );
+                        () -> step.execute(context));
 
         ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
-
 
         assertEquals(modelFailure, thrown);
         assertEquals(
                 RuntimeInvocationStatus.FAILED,
-                invocation.status()
-        );
+                invocation.status());
         assertEquals(
                 modelFailure,
-                invocation.failure()
-        );
+                invocation.failure());
     }
 
     @Test
     void shouldRejectNullModelResponse() {
         Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+                new Execution("execution-001", DEFINITION);
 
-        ExecutionContext context =
-                new DefaultExecutionContext(
-                        execution
-                );
+        ExecutionContext context = new DefaultExecutionContext(execution);
 
         ModelExecutionStep step =
                 new ModelExecutionStep(
                         request -> null,
-                        () -> "invocation-001"
-                );
+                        () -> "invocation-001");
 
         IllegalStateException exception =
                 assertThrows(
                         IllegalStateException.class,
-                        () -> step.execute(context)
-                );
+                        () -> step.execute(context));
 
         ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
 
         assertEquals(
                 "modelInvoker returned null response",
-                exception.getMessage()
-        );
+                exception.getMessage());
         assertEquals(
                 RuntimeInvocationStatus.FAILED,
-                invocation.status()
-        );
+                invocation.status());
         assertEquals(
                 exception,
-                invocation.failure()
-        );
+                invocation.failure());
     }
 }
