@@ -13,12 +13,10 @@ public final class Agent {
     private Agent(Builder builder) {
         this.name = requireNotBlank(
                 builder.name,
-                "name"
-        );
+                "name");
         this.systemPrompt = requireNotBlank(
                 builder.systemPrompt,
-                "systemPrompt"
-        );
+                "systemPrompt");
     }
 
     public static Builder builder() {
@@ -47,7 +45,6 @@ public final class Agent {
                     fieldName + " must not be blank"
             );
         }
-
         return value;
     }
 
