@@ -5,6 +5,7 @@ import io.agentflow.execution.ExecutionResult;
 import io.agentflow.execution.invocation.RuntimeInvocation;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
+import io.agentflow.tool.invocation.ToolInvocation;
 
 import java.util.Objects;
 
@@ -17,40 +18,31 @@ public final class DefaultExecutionResultHandler
 
     @Override
     public ExecutionResult handle(ExecutionContext context) {
+
         Objects.requireNonNull(context, "context must not be null");
-
         RuntimeInvocation invocation;
-
         try {
-
             invocation =
                     context.record()
                             .lastInvocation();
-
         } catch (IllegalStateException exception) {
-
-            throw new IllegalStateException(
-                    "modelInvocation not found",
-                    exception
-            );
-
+            throw new IllegalStateException("modelInvocation not found", exception);
         }
 
-        if (!(invocation instanceof ModelInvocation modelInvocation)) {
-
-            throw new IllegalStateException(
-                    "last invocation is not model invocation"
-            );
-
+        if (invocation instanceof ModelInvocation modelInvocation) {
+            ModelResponse response =
+                    Objects.requireNonNull(
+                            modelInvocation.response(), "model response must not be null");
+            return ExecutionResult.of(response.content());
+        }
+        if (invocation instanceof ToolInvocation toolInvocation) {
+            Object result =
+                    Objects.requireNonNull(
+                            toolInvocation.result(), "tool result must not be null");
+            return ExecutionResult.of(String.valueOf(result));
         }
 
-
-        ModelResponse response =
-                modelInvocation.response();
-
-
-        return ExecutionResult.of(
-                response.content()
-        );
+        throw new IllegalStateException(
+                "unsupported invocation type: " + invocation.getClass());
     }
 }

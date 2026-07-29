@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultExecutionEngineToolTest {
 
-
     private static final ExecutionDefinition DEFINITION =
             new ExecutionDefinition(
                     "assistant",
@@ -29,133 +28,84 @@ class DefaultExecutionEngineToolTest {
                     "query order"
             );
 
-
     @Test
     void shouldExecuteToolAndCompleteExecution() {
-
 
         ToolDefinition toolDefinition =
                 new ToolDefinition(
                         "order-query",
-                        "query order"
-                );
-
+                        "query order");
 
         ToolInvoker toolInvoker =
                 (definition, arguments) ->
                         "order-result";
 
-
         ToolExecutionStep toolStep =
                 new ToolExecutionStep(
                         toolDefinition,
-                        toolInvoker
-                );
+                        toolInvoker);
 
-
-        ExecutionEngine engine =
-                createEngine(
-                        toolStep
-                );
-
+        ExecutionEngine engine = createEngine(toolStep);
 
         Execution execution =
                 new Execution(
                         "execution-001",
-                        DEFINITION
-                );
-
+                        DEFINITION);
 
         ExecutionResult result =
-                engine.execute(
-                        execution
-                );
-
+                engine.execute(execution);
 
         assertEquals(
-                "result",
-                result.content()
-        );
-
+                "order-result",
+                result.content());
 
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
-                execution.status()
-        );
-
+                execution.status());
     }
-
 
     @Test
     void shouldFailExecutionWhenToolFails() {
 
-
         ToolDefinition toolDefinition =
                 new ToolDefinition(
                         "order-query",
-                        "query order"
-                );
-
+                        "query order");
 
         ToolInvoker toolInvoker =
                 (definition, arguments) -> {
 
-                    throw new RuntimeException(
-                            "tool unavailable"
-                    );
-
+                    throw new RuntimeException("tool unavailable");
                 };
-
 
         ExecutionEngine engine =
                 createEngine(
                         new ToolExecutionStep(
                                 toolDefinition,
-                                toolInvoker
-                        )
-                );
-
+                                toolInvoker));
 
         Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
-
+                new Execution("execution-001", DEFINITION);
 
         RuntimeException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
                         RuntimeException.class,
-                        () -> engine.execute(execution)
-                );
-
+                        () -> engine.execute(execution));
 
         assertEquals(
                 "tool unavailable",
-                exception.getMessage()
-        );
-
+                exception.getMessage());
 
         assertEquals(
                 ExecutionStatus.FAILED,
-                execution.status()
-        );
-
+                execution.status());
     }
 
 
-    private ExecutionEngine createEngine(
-            ToolExecutionStep step
-    ) {
-
+    private ExecutionEngine createEngine(ToolExecutionStep step) {
 
         ExecutionPipeline pipeline =
-                new DefaultExecutionPipeline(
-                        List.of(
-                                step
-                        )
-                );
-
+                new DefaultExecutionPipeline(List.of(step));
 
         ExecutionEnvironment environment =
                 new DefaultExecutionEnvironment(
@@ -165,14 +115,8 @@ class DefaultExecutionEngineToolTest {
                                 List.of()
                         ),
                         pipeline,
-                        new DefaultExecutionResultHandler()
-                );
-
-
-        return new DefaultExecutionEngine(
-                environment
-        );
-
+                        new DefaultExecutionResultHandler());
+        return new DefaultExecutionEngine(environment);
     }
 
 }
