@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface AgentRegistry {
 
-    void register(Agent agentDefinition);
+    void register(Agent agent);
 
     Agent get(String id);
 

@@ -5,10 +5,14 @@ import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionContext;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionResult;
+import io.agentflow.execution.record.ExecutionRecord;
 import io.agentflow.model.ModelRequest;
 import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
+import io.agentflow.tool.invocation.ToolInvocation;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
