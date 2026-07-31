@@ -2,6 +2,8 @@ package io.agentflow.agent;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -12,6 +14,7 @@ public class AgentTest {
         Agent agent = Agent.builder()
                 .name("assistant")
                 .systemPrompt("You are a helpful assistant.")
+                .requiredTools(List.of("query-tool"))
                 .build();
 
         assertEquals("assistant", agent.name());
@@ -43,13 +46,11 @@ public class AgentTest {
                 () -> Agent.builder()
                         .name("   ")
                         .systemPrompt("You are helpful.")
-                        .build()
-        );
+                        .build());
 
         assertEquals(
                 "name must not be blank",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
@@ -58,13 +59,11 @@ public class AgentTest {
                 NullPointerException.class,
                 () -> Agent.builder()
                         .name("assistant")
-                        .build()
-        );
+                        .build());
 
         assertEquals(
                 "systemPrompt must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
@@ -74,13 +73,11 @@ public class AgentTest {
                 () -> Agent.builder()
                         .name("assistant")
                         .systemPrompt("   ")
-                        .build()
-        );
+                        .build());
 
         assertEquals(
                 "systemPrompt must not be blank",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
@@ -91,8 +88,8 @@ public class AgentTest {
                         """
                           You are a helpful assistant.
                           Answer clearly.
-                        """
-                )
+                        """)
+                .requiredTools(List.of("query-tool"))
                 .build();
 
         assertEquals("  assistant  ", agent.name());
@@ -100,8 +97,19 @@ public class AgentTest {
                 """
                   You are a helpful assistant.
                   Answer clearly.
-                """,
-                agent.systemPrompt()
-        );
+                """, agent.systemPrompt());
+    }
+
+    @Test
+    void shouldCreateAgentWithRequiredTools() {
+        Agent agent =
+                Agent.builder()
+                        .name("assistant")
+                        .systemPrompt("help")
+                        .requiredTools(List.of("order-query"))
+                        .build();
+        assertEquals(
+                List.of("order-query"),
+                agent.requiredTools());
     }
 }

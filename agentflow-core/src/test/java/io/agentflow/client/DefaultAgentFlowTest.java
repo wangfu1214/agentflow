@@ -34,6 +34,7 @@ class DefaultAgentFlowTest {
                 Agent.builder()
                         .name("assistant")
                         .systemPrompt("You are helpful.")
+                        .requiredTools(List.of("query-tool"))
                         .build();
 
 

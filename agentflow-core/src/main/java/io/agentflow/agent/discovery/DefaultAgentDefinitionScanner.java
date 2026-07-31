@@ -3,10 +3,7 @@ package io.agentflow.agent.discovery;
 import io.agentflow.agent.Agent;
 import io.agentflow.agent.annotation.AgentDefinition;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class DefaultAgentDefinitionScanner implements AgentDefinitionScanner {
 
@@ -24,6 +21,7 @@ public class DefaultAgentDefinitionScanner implements AgentDefinitionScanner {
             Agent agent = Agent.builder()
                     .name(annotation.name())
                     .systemPrompt(annotation.systemPrompt())
+                    .requiredTools(Arrays.asList(annotation.tools()))
                     .build();
             agents.add(agent);
         }

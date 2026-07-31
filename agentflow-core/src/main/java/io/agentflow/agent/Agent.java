@@ -1,5 +1,6 @@
 package io.agentflow.agent;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -8,7 +9,10 @@ import java.util.Objects;
 public final class Agent {
 
     private final String name;
+
     private final String systemPrompt;
+
+    private final List<String> requiredTools;
 
     private Agent(Builder builder) {
         this.name = requireNotBlank(
@@ -17,6 +21,10 @@ public final class Agent {
         this.systemPrompt = requireNotBlank(
                 builder.systemPrompt,
                 "systemPrompt");
+        this.requiredTools =
+                List.copyOf(
+                        builder.requiredTools
+                );
     }
 
     public static Builder builder() {
@@ -31,19 +39,16 @@ public final class Agent {
         return systemPrompt;
     }
 
-    private static String requireNotBlank(
-            String value,
-            String fieldName
-    ) {
-        Objects.requireNonNull(
-                value,
-                fieldName + " must not be null"
-        );
+    public List<String> requiredTools () {
+        return requiredTools;
+    }
+
+    private static String requireNotBlank(String value, String fieldName) {
+        Objects.requireNonNull(value,
+                fieldName + " must not be null");
 
         if (value.isBlank()) {
-            throw new IllegalArgumentException(
-                    fieldName + " must not be blank"
-            );
+            throw new IllegalArgumentException(fieldName + " must not be blank");
         }
         return value;
     }
@@ -51,7 +56,10 @@ public final class Agent {
     public static final class Builder {
 
         private String name;
+
         private String systemPrompt;
+
+        private List<String> requiredTools;
 
         private Builder() {
         }
@@ -63,6 +71,12 @@ public final class Agent {
 
         public Builder systemPrompt(String systemPrompt) {
             this.systemPrompt = systemPrompt;
+            return this;
+        }
+
+        public Builder requiredTools(List<String> tools) {
+            this.requiredTools =
+                    Objects.requireNonNull(tools, "requiredTools must not be null");
             return this;
         }
 

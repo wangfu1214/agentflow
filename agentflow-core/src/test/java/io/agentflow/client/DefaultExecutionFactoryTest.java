@@ -6,6 +6,8 @@ import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionStatus;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultExecutionFactoryTest {
@@ -15,6 +17,7 @@ public class DefaultExecutionFactoryTest {
         Agent agent = Agent.builder()
                 .name("assistant")
                 .systemPrompt("You are helpful.")
+                .requiredTools(List.of("query-tool"))
                 .build();
 
         AgentRequest request =

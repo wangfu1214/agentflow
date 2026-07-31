@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DefaultAgentDefinitionScannerTest {
     @AgentDefinition(
             name = "assistant",
-            systemPrompt = "You are helpful"
+            systemPrompt = "You are helpful",
+            tools = {"order-query"}
     )
     static class AssistantAgent {
 
@@ -34,6 +35,16 @@ class DefaultAgentDefinitionScannerTest {
         assertEquals(
                 "You are helpful",
                 agent.systemPrompt());
+    }
+
+    @Test
+    void shouldScanRequiredTools() {
+        Agent agent =   Agent.builder()
+                .name("assistant")
+                .systemPrompt("help")
+                .requiredTools(List.of("order-query"))
+                .build();
+        assertEquals("order-query", agent.requiredTools().get(0));
     }
 
 }

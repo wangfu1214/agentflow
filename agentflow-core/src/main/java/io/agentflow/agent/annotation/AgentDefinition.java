@@ -24,4 +24,9 @@ public @interface AgentDefinition {
      * prompt
      */
     String systemPrompt();
+
+    /**
+     * tools
+     */
+    String [] tools() default {};
 }
