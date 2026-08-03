@@ -9,19 +9,14 @@ class ExecutionResultTest {
 
     @Test
     void shouldCreateExecutionResult() {
-        ExecutionResult result =
-                ExecutionResult.of("Hello AgentFlow");
+        ExecutionResult result = ExecutionResult.of("Hello AgentFlow");
 
-        assertEquals(
-                "Hello AgentFlow",
-                result.content()
-        );
+        assertEquals("Hello AgentFlow", result.content());
     }
 
     @Test
     void shouldAllowEmptyContent() {
-        ExecutionResult result =
-                ExecutionResult.of("");
+        ExecutionResult result = ExecutionResult.of("");
 
         assertEquals("", result.content());
     }
@@ -30,12 +25,10 @@ class ExecutionResultTest {
     void shouldRejectNullContent() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> ExecutionResult.of(null)
-        );
+                () -> ExecutionResult.of(null));
 
         assertEquals(
                 "content must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 }

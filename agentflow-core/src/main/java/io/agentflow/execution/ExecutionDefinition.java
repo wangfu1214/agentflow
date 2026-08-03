@@ -1,5 +1,6 @@
 package io.agentflow.execution;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -9,14 +10,17 @@ import java.util.Objects;
  * @param systemPrompt system instructions captured for the execution
  * @param input        caller input captured for the execution
  */
-public record ExecutionDefinition( String agentName,
-                                   String systemPrompt,
-                                   String input) {
+public record ExecutionDefinition(String agentName,
+                                  String systemPrompt,
+                                  String input,
+                                  List<String> requiredTools) {
 
     public ExecutionDefinition {
         agentName = requireNotBlank(agentName, "agentName");
         systemPrompt = requireNotBlank(systemPrompt, "systemPrompt");
         input = requireNotBlank(input, "input");
+        Objects.requireNonNull(requiredTools, "requiredTools must not be null");
+        requiredTools = List.copyOf(requiredTools);
     }
 
     private static String requireNotBlank(String value, String fieldName) {

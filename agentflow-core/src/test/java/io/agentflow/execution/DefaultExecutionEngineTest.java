@@ -23,7 +23,8 @@ public class DefaultExecutionEngineTest {
             new ExecutionDefinition(
                     "assistant",
                     "You are helpful.",
-                    "Hello"
+                    "Hello",
+                    List.of()
             );
 
     @Test

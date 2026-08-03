@@ -15,84 +15,49 @@ class ToolInvocationTest {
     @Test
     void shouldCreateToolInvocation() {
 
-        ToolInvocation invocation =
-                new ToolInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        "order-query",
-                        Map.of(
-                                "id",
-                                "123"
-                        )
-                );
-
+        ToolInvocation invocation = new ToolInvocation(
+                "invocation-001",
+                "execution-001",
+                "order-query",
+                Map.of("id", "123"));
 
         assertEquals(
                 "order-query",
-                invocation.toolName()
-        );
-
+                invocation.toolName());
 
         assertEquals(
                 RuntimeInvocationStatus.CREATED,
-                invocation.status()
-        );
+                invocation.status());
 
     }
-
 
 
     @Test
     void shouldSupportRuntimeInvocationLifecycle() {
+        ToolInvocation invocation = new ToolInvocation(
+                "invocation-001",
+                "execution-001",
+                "order-query",
+                Map.of("id", "123"));
 
-
-        ToolInvocation invocation =
-                new ToolInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        "order-query",
-                        Map.of(
-                                "id",
-                                "123"
-                        )
-                );
-
-
-        RuntimeInvocation runtimeInvocation =
-                invocation;
-
+        RuntimeInvocation runtimeInvocation = invocation;
 
         runtimeInvocation.start();
 
-
         assertEquals(
                 RuntimeInvocationStatus.RUNNING,
-                runtimeInvocation.status()
-        );
+                runtimeInvocation.status());
 
+        RuntimeException exception = new RuntimeException("tool failed");
 
-        RuntimeException exception =
-                new RuntimeException(
-                        "tool failed"
-                );
-
-
-        runtimeInvocation.fail(
-                exception
-        );
-
+        runtimeInvocation.fail(exception);
 
         assertEquals(
                 RuntimeInvocationStatus.FAILED,
-                invocation.status()
-        );
-
+                invocation.status());
 
         assertEquals(
                 exception,
-                invocation.failure()
-        );
-
+                invocation.failure());
     }
-
 }

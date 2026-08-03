@@ -10,34 +10,35 @@ import io.agentflow.model.ModelResponse;
 import io.agentflow.model.invocation.ModelInvocation;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ModelExecutionStepTest {
 
-    private static final ExecutionDefinition DEFINITION =
-            new ExecutionDefinition(
-                    "assistant",
-                    "You are helpful.",
-                    "Hello");
+    private static final ExecutionDefinition DEFINITION = new ExecutionDefinition(
+            "assistant",
+            "You are helpful.",
+            "Hello",
+            List.of());
 
     @Test
     void shouldCompleteModelInvocation() {
         Execution execution = new Execution("execution-001", DEFINITION);
         ExecutionContext context = new DefaultExecutionContext(execution);
-        ModelExecutionStep step =
-                new ModelExecutionStep(
-                        request -> {
-                            assertEquals(
-                                    "You are helpful.",
-                                    request.systemPrompt());
-                            assertEquals(
-                                    "Hello",
-                                    request.input());
+        ModelExecutionStep step = new ModelExecutionStep(
+                request -> {
+                    assertEquals(
+                            "You are helpful.",
+                            request.systemPrompt());
+                    assertEquals(
+                            "Hello",
+                            request.input());
 
-                            return ModelResponse.of("Hello from model");
-                        },
-                        () -> "invocation-001");
+                    return ModelResponse.of("Hello from model");
+                },
+                () -> "invocation-001");
 
         step.execute(context);
 
@@ -58,22 +59,19 @@ class ModelExecutionStepTest {
     void shouldMarkInvocationFailedWhenModelFails() {
         RuntimeException modelFailure = new RuntimeException("model unavailable");
 
-        Execution execution =
-                new Execution("execution-001", DEFINITION);
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionContext context = new DefaultExecutionContext(execution);
 
-        ModelExecutionStep step =
-                new ModelExecutionStep(
-                        request -> {
-                            throw modelFailure;
-                        },
-                        () -> "invocation-001");
+        ModelExecutionStep step = new ModelExecutionStep(
+                request -> {
+                    throw modelFailure;
+                },
+                () -> "invocation-001");
 
-        RuntimeException thrown =
-                assertThrows(
-                        RuntimeException.class,
-                        () -> step.execute(context));
+        RuntimeException thrown = assertThrows(
+                RuntimeException.class,
+                () -> step.execute(context));
 
         ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
 
@@ -88,20 +86,17 @@ class ModelExecutionStepTest {
 
     @Test
     void shouldRejectNullModelResponse() {
-        Execution execution =
-                new Execution("execution-001", DEFINITION);
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionContext context = new DefaultExecutionContext(execution);
 
-        ModelExecutionStep step =
-                new ModelExecutionStep(
-                        request -> null,
-                        () -> "invocation-001");
+        ModelExecutionStep step = new ModelExecutionStep(
+                request -> null,
+                () -> "invocation-001");
 
-        IllegalStateException exception =
-                assertThrows(
-                        IllegalStateException.class,
-                        () -> step.execute(context));
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> step.execute(context));
 
         ModelInvocation invocation = (ModelInvocation) context.record().lastInvocation();
 

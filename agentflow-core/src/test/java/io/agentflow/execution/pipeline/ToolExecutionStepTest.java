@@ -20,33 +20,27 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 class ToolExecutionStepTest {
-
 
     @Test
     void shouldCompleteToolInvocation() {
 
-        ToolDefinition definition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order information");
+        ToolDefinition definition = new ToolDefinition("order-query", "query order information");
 
         ToolInvoker invoker = (tool, arguments) -> "order-result";
 
-        ToolExecutionStep step =
-                new ToolExecutionStep(
-                        definition,
-                        invoker,
-                        () -> "tool-invocation-001");
+        ToolExecutionStep step = new ToolExecutionStep(
+                definition,
+                invoker,
+                () -> "tool-invocation-001");
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        new ExecutionDefinition(
-                                "assistant",
-                                "system prompt",
-                                "hello"));
+        Execution execution = new Execution(
+                "execution-001",
+                new ExecutionDefinition(
+                        "assistant",
+                        "system prompt",
+                        "hello",
+                        List.of()));
 
         TestExecutionContext context = new TestExecutionContext(execution);
         step.execute(context);
@@ -56,11 +50,9 @@ class ToolExecutionStepTest {
                         .invocations()
                         .size());
 
-        ToolInvocation invocation =
-                (ToolInvocation)
-                        context.record()
-                                .invocations()
-                                .get(0);
+        ToolInvocation invocation = (ToolInvocation) context.record()
+                .invocations()
+                .get(0);
 
         assertEquals(
                 "tool-invocation-001",
@@ -81,50 +73,43 @@ class ToolExecutionStepTest {
 
     @Test
     void shouldMarkToolInvocationFailedWhenInvokerThrows() {
-        ToolDefinition definition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order information");
+        ToolDefinition definition = new ToolDefinition(
+                "order-query",
+                "query order information");
 
-        ToolInvoker invoker =
-                (tool, arguments) -> {
-                    throw new RuntimeException("tool failed");
-                };
+        ToolInvoker invoker = (tool, arguments) -> {
+            throw new RuntimeException("tool failed");
+        };
 
-        ToolExecutionStep step =
-                new ToolExecutionStep(definition, invoker, () -> "tool-invocation-001");
+        ToolExecutionStep step = new ToolExecutionStep(definition, invoker, () -> "tool-invocation-001");
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        new ExecutionDefinition(
-                                "assistant",
-                                "system prompt",
-                                "hello"));
+        Execution execution = new Execution(
+                "execution-001",
+                new ExecutionDefinition(
+                        "assistant",
+                        "system prompt",
+                        "hello",
+                        List.of()));
 
         TestExecutionContext context = new TestExecutionContext(execution);
 
-        RuntimeException exception =
-                assertThrows(
-                        RuntimeException.class,
-                        () -> step.execute(context));
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> step.execute(context));
 
         assertEquals(
                 "tool failed",
                 exception.getMessage());
 
-        ToolInvocation invocation =
-                (ToolInvocation)
-                        context.record()
-                                .invocations()
-                                .get(0);
+        ToolInvocation invocation = (ToolInvocation) context.record()
+                .invocations()
+                .get(0);
 
         assertEquals(RuntimeInvocationStatus.FAILED, invocation.status());
 
         assertEquals("tool failed", invocation.failure().getMessage());
 
     }
-
 
 
     private static final class TestExecutionContext

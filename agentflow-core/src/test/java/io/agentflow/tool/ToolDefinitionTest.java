@@ -13,26 +13,15 @@ class ToolDefinitionTest {
 
     @Test
     void shouldCreateToolDefinition() {
-
-
-        ToolDefinition definition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order information"
-                );
-
+        ToolDefinition definition = new ToolDefinition("order-query", "query order information");
 
         assertEquals(
                 "order-query",
-                definition.name()
-        );
-
+                definition.name());
 
         assertEquals(
                 "query order information",
-                definition.description()
-        );
-
+                definition.description());
     }
 
 
@@ -40,14 +29,11 @@ class ToolDefinitionTest {
     @Test
     void shouldRejectBlankName() {
 
-
         assertThrows(
                 IllegalArgumentException.class,
                 () -> new ToolDefinition(
                         "",
-                        "description"
-                )
-        );
+                        "description"));
 
     }
 

@@ -18,36 +18,30 @@ public class AgentRequestTest {
     void shouldRejectNullInput() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> AgentRequest.of(null)
-        );
+                () -> AgentRequest.of(null));
 
         assertEquals(
                 "input must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldRejectBlankInput() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> AgentRequest.of("   ")
-        );
+                () -> AgentRequest.of("   "));
 
         assertEquals(
                 "input must not be blank",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldPreserveOriginalInput() {
-        AgentRequest request =
-                AgentRequest.of("  Hello AgentFlow  ");
+        AgentRequest request = AgentRequest.of("  Hello AgentFlow  ");
 
         assertEquals(
                 "  Hello AgentFlow  ",
-                request.input()
-        );
+                request.input());
     }
 }

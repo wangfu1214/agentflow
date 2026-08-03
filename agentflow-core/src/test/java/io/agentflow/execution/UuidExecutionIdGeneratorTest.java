@@ -11,8 +11,7 @@ public class UuidExecutionIdGeneratorTest {
 
     @Test
     void shouldGenerateValidUniqueUuidValues() {
-        ExecutionIdGenerator generator =
-                new UuidExecutionIdGenerator();
+        ExecutionIdGenerator generator = new UuidExecutionIdGenerator();
 
         String first = generator.generate();
         String second = generator.generate();

@@ -3,6 +3,7 @@ package io.agentflow.execution;
 import io.agentflow.execution.lifecycle.ExecutionLifecycle;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,139 +15,91 @@ public class DefaultExecutionLifecycleTest {
             new ExecutionDefinition(
                     "assistant",
                     "You are helpful.",
-                    "Hello"
+                    "Hello",
+                    List.of()
             );
-
 
     @Test
     void shouldInvokeBeforeAndAfterLifecycle() {
 
+        AtomicBoolean beforeCalled = new AtomicBoolean(false);
 
-        AtomicBoolean beforeCalled =
-                new AtomicBoolean(false);
+        AtomicBoolean afterCalled = new AtomicBoolean(false);
 
+        ExecutionLifecycle lifecycle = new ExecutionLifecycle() {
+            @Override
+            public void beforeExecute(
+                    Execution execution,
+                    ExecutionContext context
+            ) {
 
-        AtomicBoolean afterCalled =
-                new AtomicBoolean(false);
+                beforeCalled.set(true);
 
+            }
 
+            @Override
+            public void afterExecute(
+                    Execution execution,
+                    ExecutionContext context
+            ) {
 
-        ExecutionLifecycle lifecycle =
-                new ExecutionLifecycle() {
+                afterCalled.set(true);
 
+            }
 
-                    @Override
-                    public void beforeExecute(
-                            Execution execution,
-                            ExecutionContext context
-                    ) {
+        };
 
-                        beforeCalled.set(true);
+        Execution execution = new Execution("execution-001", DEFINITION);
 
-                    }
-
-
-                    @Override
-                    public void afterExecute(
-                            Execution execution,
-                            ExecutionContext context
-                    ) {
-
-                        afterCalled.set(true);
-
-                    }
-
-                };
-
-
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
-
-
-        ExecutionEngine engine =
-                TestExecutionEngineFactory.create(
-                        lifecycle
-                );
-
+        ExecutionEngine engine = TestExecutionEngineFactory.create(lifecycle);
 
         engine.execute(execution);
 
+        assertTrue(beforeCalled.get());
 
-        assertTrue(
-                beforeCalled.get()
-        );
-
-
-        assertTrue(
-                afterCalled.get()
-        );
+        assertTrue(afterCalled.get());
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
-                execution.status()
-        );
-
+                execution.status());
     }
-
 
     @Test
     void shouldInvokeErrorLifecycle() {
 
+        AtomicBoolean errorCalled = new AtomicBoolean(false);
 
-        AtomicBoolean errorCalled =
-                new AtomicBoolean(false);
+        ExecutionLifecycle lifecycle = new ExecutionLifecycle() {
 
+            @Override
+            public void onError(
+                    Execution execution,
+                    ExecutionContext context,
+                    Exception exception
+            ) {
 
+                errorCalled.set(true);
 
-        ExecutionLifecycle lifecycle =
-                new ExecutionLifecycle() {
+            }
+        };
 
-
-                    @Override
-                    public void onError(
-                            Execution execution,
-                            ExecutionContext context,
-                            Exception exception
-                    ) {
-
-                        errorCalled.set(true);
-
-                    }
-
-                };
-
-
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
 
         ExecutionEngine engine =
                 TestExecutionEngineFactory.create(
                         lifecycle,
                         request -> {
-                            throw new RuntimeException(
-                                    "failed"
-                            );
-                        }
-                );
+                            throw new RuntimeException("failed");
+                        });
 
 
         try {
-
             engine.execute(execution);
 
-        } catch(RuntimeException ignored){
+        } catch (RuntimeException ignored) {
 
         }
 
-        assertTrue(
-                errorCalled.get()
-        );
-
+        assertTrue(errorCalled.get());
     }
 }

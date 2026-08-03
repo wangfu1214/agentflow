@@ -25,7 +25,8 @@ class DefaultExecutionEngineToolTest {
             new ExecutionDefinition(
                     "assistant",
                     "You are helpful.",
-                    "query order"
+                    "query order",
+                    List.of()
             );
 
     @Test

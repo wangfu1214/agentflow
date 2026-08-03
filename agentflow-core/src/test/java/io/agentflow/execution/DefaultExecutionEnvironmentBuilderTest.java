@@ -1,7 +1,5 @@
 package io.agentflow.execution;
 
-
-
 import io.agentflow.execution.environment.DefaultExecutionEnvironmentBuilder;
 import io.agentflow.execution.environment.ExecutionEnvironment;
 import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
@@ -13,28 +11,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 class DefaultExecutionEnvironmentBuilderTest {
 
 
     @Test
     void shouldBuildExecutionEnvironment(){
 
-
         ExecutionContextFactory factory =
                 new DefaultExecutionContextFactory();
 
-
-        ExecutionPipeline pipeline =
-                context -> {};
-
+        ExecutionPipeline pipeline = context -> {};
 
         ExecutionResultHandler handler =
                 context ->
-                        ExecutionResult.of(
-                                "result"
-                        );
-
+                        ExecutionResult.of("result");
 
         ExecutionEnvironment environment =
                 new DefaultExecutionEnvironmentBuilder()
@@ -47,24 +37,11 @@ class DefaultExecutionEnvironmentBuilderTest {
                         .resultHandler(handler)
                         .build();
 
+        assertEquals(factory, environment.contextFactory());
 
+        assertEquals(pipeline, environment.pipeline());
 
-        assertEquals(
-                factory,
-                environment.contextFactory()
-        );
-
-
-        assertEquals(
-                pipeline,
-                environment.pipeline()
-        );
-
-
-        assertEquals(
-                handler,
-                environment.resultHandler()
-        );
+        assertEquals(handler, environment.resultHandler());
 
     }
 

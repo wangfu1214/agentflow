@@ -58,7 +58,8 @@ class DefaultExecutionEngineToolRegistryTest {
                         new ExecutionDefinition(
                                 "assistant",
                                 "system",
-                                "query order"));
+                                "query order",
+                                List.of()));
 
         ExecutionResult result = engine.execute(execution);
 

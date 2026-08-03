@@ -5,6 +5,7 @@ import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionDefinition;
 import io.agentflow.execution.ExecutionFactory;
 
+import java.util.List;
 import java.util.Objects;
 
 public final class DefaultAgentExecutionFactory implements AgentExecutionFactory {
@@ -24,7 +25,8 @@ public final class DefaultAgentExecutionFactory implements AgentExecutionFactory
                 new ExecutionDefinition(
                         agent.name(),
                         agent.systemPrompt(),
-                        request.input());
+                        request.input(),
+                        agent.requiredTools());
         return factory.create(definition);
     }
 }

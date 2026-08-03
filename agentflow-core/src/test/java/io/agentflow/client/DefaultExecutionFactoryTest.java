@@ -20,39 +20,29 @@ public class DefaultExecutionFactoryTest {
                 .requiredTools(List.of("query-tool"))
                 .build();
 
-        AgentRequest request =
-                AgentRequest.of("Hello");
+        AgentRequest request = AgentRequest.of("Hello");
 
         ExecutionDefinition definition = new ExecutionDefinition(
-                "assistant", "You are helpful.", "Hello");
+                "assistant", "You are helpful.", "Hello", List.of());
 
-        DefaultExecutionFactory factory =
-                new DefaultExecutionFactory(
-                        () -> "execution-001"
-                );
+        DefaultExecutionFactory factory = new DefaultExecutionFactory(() -> "execution-001");
 
-        Execution execution =
-                factory.create(definition);
+        Execution execution = factory.create(definition);
 
         assertEquals(
                 "execution-001",
-                execution.id()
-        );
+                execution.id());
         assertEquals(
                 ExecutionStatus.CREATED,
-                execution.status()
-        );
+                execution.status());
         assertEquals(
                 "assistant",
-                execution.definition().agentName()
-        );
+                execution.definition().agentName());
         assertEquals(
                 "You are helpful.",
-                execution.definition().systemPrompt()
-        );
+                execution.definition().systemPrompt());
         assertEquals(
                 "Hello",
-                execution.definition().input()
-        );
+                execution.definition().input());
     }
 }

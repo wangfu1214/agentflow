@@ -10,32 +10,29 @@ import io.agentflow.tool.ToolDefinition;
 import io.agentflow.tool.ToolInvoker;
 import io.agentflow.tool.invocation.ToolInvocation;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultExecutionPipelineTest {
 
     @Test
     void shouldExecuteToolStepInPipeline() {
-        ToolDefinition definition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order");
-        ToolInvoker invoker =
-                (tool, arguments) -> "order-result";
-        ToolExecutionStep toolStep =
-                new ToolExecutionStep(
-                        definition,
-                        invoker,
-                        () -> "tool-invocation-001");
+        ToolDefinition definition = new ToolDefinition("order-query", "query order");
+        ToolInvoker invoker = (tool, arguments) -> "order-result";
+        ToolExecutionStep toolStep = new ToolExecutionStep(
+                definition,
+                invoker,
+                () -> "tool-invocation-001");
         DefaultExecutionPipeline pipeline = new DefaultExecutionPipeline(List.of(toolStep));
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        new ExecutionDefinition(
-                                "assistant",
-                                "system prompt",
-                                "query order"));
+        Execution execution = new Execution(
+                "execution-001",
+                new ExecutionDefinition(
+                        "assistant",
+                        "system prompt",
+                        "query order",
+                        List.of()));
         TestExecutionContext context = new TestExecutionContext(execution);
         pipeline.execute(context);
         assertEquals(
@@ -44,11 +41,9 @@ class DefaultExecutionPipelineTest {
                         .invocations()
                         .size());
 
-        ToolInvocation invocation =
-                (ToolInvocation)
-                        context.record()
-                                .invocations()
-                                .get(0);
+        ToolInvocation invocation = (ToolInvocation) context.record()
+                .invocations()
+                .get(0);
 
         assertEquals(
                 "order-query",
@@ -66,6 +61,7 @@ class DefaultExecutionPipelineTest {
         private final Execution execution;
         private final ExecutionRecord record = new ExecutionRecord("execution-001");
         private ExecutionStatus status = ExecutionStatus.CREATED;
+
         private TestExecutionContext(Execution execution) {
             this.execution = execution;
         }

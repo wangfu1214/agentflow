@@ -9,78 +9,54 @@ public class AgentResponseTest {
 
     @Test
     void shouldCreateResponse() {
-        AgentResponse response =
-                AgentResponse.of(
-                        "execution-001",
-                        "Hello AgentFlow"
-                );
+        AgentResponse response = AgentResponse.of(
+                "execution-001",
+                "Hello AgentFlow");
 
         assertEquals(
                 "execution-001",
-                response.executionId()
-        );
+                response.executionId());
         assertEquals(
                 "Hello AgentFlow",
-                response.content()
-        );
+                response.content());
     }
 
     @Test
     void shouldRejectNullExecutionId() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> AgentResponse.of(
-                        null,
-                        "Hello"
-                )
-        );
+                () -> AgentResponse.of(null, "Hello"));
 
         assertEquals(
                 "executionId must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldRejectBlankExecutionId() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> AgentResponse.of(
-                        "   ",
-                        "Hello"
-                )
-        );
+                () -> AgentResponse.of("   ", "Hello"));
 
         assertEquals(
                 "executionId must not be blank",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldRejectNullContent() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
-                () -> AgentResponse.of(
-                        "execution-001",
-                        null
-                )
-        );
+                () -> AgentResponse.of("execution-001", null));
 
         assertEquals(
                 "content must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldAllowEmptyContent() {
-        AgentResponse response =
-                AgentResponse.of(
-                        "execution-001",
-                        ""
-                );
-
+        AgentResponse response = AgentResponse.of("execution-001", "");
         assertEquals("", response.content());
     }
 }

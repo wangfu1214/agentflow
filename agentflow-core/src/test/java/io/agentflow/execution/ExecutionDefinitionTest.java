@@ -2,6 +2,8 @@ package io.agentflow.execution;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -13,14 +15,13 @@ public class ExecutionDefinitionTest {
                 new ExecutionDefinition(
                         "assistant",
                         "You are helpful.",
-                        "Hello"
-                );
+                        "Hello",
+                        List.of());
 
         assertEquals("assistant", definition.agentName());
         assertEquals(
                 "You are helpful.",
-                definition.systemPrompt()
-        );
+                definition.systemPrompt());
         assertEquals("Hello", definition.input());
     }
 
@@ -30,15 +31,15 @@ public class ExecutionDefinitionTest {
                 new ExecutionDefinition(
                         "assistant",
                         "You are helpful.",
-                        "Hello"
-                );
+                        "Hello",
+                        List.of());
 
         ExecutionDefinition second =
                 new ExecutionDefinition(
                         "assistant",
                         "You are helpful.",
-                        "Hello"
-                );
+                        "Hello",
+                        List.of());
 
         assertEquals(first, second);
     }
@@ -50,13 +51,11 @@ public class ExecutionDefinitionTest {
                 () -> new ExecutionDefinition(
                         "assistant",
                         "You are helpful.",
-                        "   "
-                )
-        );
+                        "  ",
+                        List.of()));
 
         assertEquals(
                 "input must not be blank",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 }

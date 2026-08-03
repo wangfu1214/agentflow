@@ -9,6 +9,7 @@ import io.agentflow.execution.lifecycle.NoopExecutionLifecycle;
 import io.agentflow.execution.pipeline.*;
 import io.agentflow.execution.result.DefaultExecutionResultHandler;
 import io.agentflow.model.ModelResponse;
+import io.agentflow.tool.ToolDefinition;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,37 +26,26 @@ public class DefaultExecutionInterceptorTest {
             new ExecutionDefinition(
                     "assistant",
                     "You are helpful.",
-                    "Hello"
-            );
-
+                    "Hello",
+                    List.of());
 
     @Test
     void shouldInvokeInterceptorBeforeAndAfterExecution() {
 
-
         AtomicBoolean beforeCalled =
                 new AtomicBoolean(false);
-
 
         AtomicBoolean afterCalled =
                 new AtomicBoolean(false);
 
-
-
         ExecutionInterceptor interceptor =
                 new ExecutionInterceptor() {
-
-
                     @Override
                     public void before(
                             Execution execution,
-                            ExecutionContext context
-                    ) {
-
+                            ExecutionContext context) {
                         beforeCalled.set(true);
-
                     }
-
 
                     @Override
                     public void after(
@@ -70,45 +60,24 @@ public class DefaultExecutionInterceptorTest {
                 };
 
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
+        ExecutionEngine engine = createEngine(interceptor);
 
-        ExecutionEngine engine =
-                createEngine(
-                        interceptor
-                );
-
-
-        ExecutionResult result =
-                engine.execute(execution);
-
+        ExecutionResult result = engine.execute(execution);
 
         assertEquals(
                 "success",
-                result.content()
-        );
+                result.content());
 
+        assertTrue(beforeCalled.get());
 
-        assertTrue(
-                beforeCalled.get()
-        );
-
-
-        assertTrue(
-                afterCalled.get()
-        );
-
+        assertTrue(afterCalled.get());
 
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
-                execution.status()
-        );
+                execution.status());
     }
-
 
 
     @Test
@@ -117,7 +86,6 @@ public class DefaultExecutionInterceptorTest {
 
         AtomicBoolean errorCalled =
                 new AtomicBoolean(false);
-
 
 
         ExecutionInterceptor interceptor =
@@ -138,13 +106,11 @@ public class DefaultExecutionInterceptorTest {
                 };
 
 
-
         Execution execution =
                 new Execution(
                         "execution-001",
                         DEFINITION
                 );
-
 
 
         ExecutionEngine engine =
@@ -157,10 +123,9 @@ public class DefaultExecutionInterceptorTest {
 
             engine.execute(execution);
 
-        } catch(RuntimeException ignored){
+        } catch (RuntimeException ignored) {
 
         }
-
 
 
         assertTrue(
@@ -174,7 +139,6 @@ public class DefaultExecutionInterceptorTest {
         );
 
     }
-
 
 
     private ExecutionEngine createEngine(
@@ -203,7 +167,6 @@ public class DefaultExecutionInterceptorTest {
         );
         return new DefaultExecutionEngine(environment);
     }
-
 
 
     private ExecutionEngine createFailedEngine(

@@ -12,11 +12,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ModelInvocationTest {
 
-    private static final ModelRequest REQUEST =
-            new ModelRequest(
-                    "You are helpful.",
-                    "Hello"
-            );
+    private static final ModelRequest REQUEST = new ModelRequest(
+            "You are helpful.",
+            "Hello");
 
     @Test
     void shouldCreateInvocationInCreatedStatus() {
@@ -24,37 +22,30 @@ class ModelInvocationTest {
                 new ModelInvocation(
                         "invocation-001",
                         "execution-001",
-                        REQUEST
-                );
+                        REQUEST);
 
         assertEquals(
                 "invocation-001",
-                invocation.id()
-        );
+                invocation.id());
         assertEquals(
                 "execution-001",
-                invocation.executionId()
-        );
+                invocation.executionId());
         assertEquals(
                 REQUEST,
-                invocation.request()
-        );
+                invocation.request());
         assertEquals(
                 RuntimeInvocationStatus.CREATED,
-                invocation.status()
-        );
+                invocation.status());
         assertNull(invocation.response());
         assertNull(invocation.failure());
     }
 
     @Test
     void shouldCompleteSuccessfulLifecycle() {
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        REQUEST
-                );
+        ModelInvocation invocation = new ModelInvocation(
+                "invocation-001",
+                "execution-001",
+                REQUEST);
 
         ModelResponse response =
                 ModelResponse.of("Hello");
@@ -66,137 +57,87 @@ class ModelInvocationTest {
 
         assertEquals(
                 RuntimeInvocationStatus.SUCCEEDED,
-                runtimeInvocation.status()
-        );
+                runtimeInvocation.status());
 
-        assertEquals(
-                RuntimeInvocationStatus.SUCCEEDED,
-                invocation.status()
-        );
-        assertEquals(
-                response,
-                invocation.response()
-        );
+        assertEquals(RuntimeInvocationStatus.SUCCEEDED, invocation.status());
+        assertEquals(response, invocation.response());
         assertNull(invocation.failure());
     }
 
     @Test
     void shouldCompleteFailedLifecycle() {
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        REQUEST
-                );
+        ModelInvocation invocation = new ModelInvocation(
+                "invocation-001",
+                "execution-001",
+                REQUEST);
 
-        RuntimeException failure =
-                new RuntimeException(
-                        "model unavailable"
-                );
+        RuntimeException failure = new RuntimeException("model unavailable");
 
         invocation.start();
         invocation.fail(failure);
 
-        assertEquals(
-                RuntimeInvocationStatus.FAILED,
-                invocation.status()
-        );
-        assertEquals(
-                failure,
-                invocation.failure()
-        );
+        assertEquals(RuntimeInvocationStatus.FAILED, invocation.status());
+        assertEquals(failure, invocation.failure());
         assertNull(invocation.response());
     }
 
     @Test
     void shouldRejectSuccessBeforeStart() {
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        REQUEST
-                );
+        ModelInvocation invocation = new ModelInvocation(
+                "invocation-001",
+                "execution-001",
+                REQUEST);
 
-        IllegalStateException exception =
-                assertThrows(
-                        IllegalStateException.class,
-                        () -> invocation.succeed(
-                                ModelResponse.of("done")
-                        )
-                );
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> invocation.succeed(ModelResponse.of("done")));
 
         assertEquals(
                 "expected model invocation status "
                         + "RUNNING but was CREATED",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldRejectStartingInvocationTwice() {
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        REQUEST
-                );
+        ModelInvocation invocation = new ModelInvocation(
+                "invocation-001",
+                "execution-001",
+                REQUEST);
 
         invocation.start();
 
-        IllegalStateException exception =
-                assertThrows(
-                        IllegalStateException.class,
-                        invocation::start
-                );
-
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                invocation::start);
         assertEquals(
                 "expected model invocation status "
                         + "CREATED but was RUNNING",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test
     void shouldSupportRuntimeInvocationLifecycle() {
 
-        ModelInvocation invocation =
-                new ModelInvocation(
-                        "invocation-001",
-                        "execution-001",
-                        REQUEST
-                );
-
+        ModelInvocation invocation = new ModelInvocation(
+                "invocation-001",
+                "execution-001",
+                REQUEST);
 
         invocation.start();
 
+        assertEquals(RuntimeInvocationStatus.RUNNING, invocation.status());
 
-        assertEquals(
-                RuntimeInvocationStatus.RUNNING,
-                invocation.status()
-        );
+        RuntimeException exception = new RuntimeException("model failed");
 
-
-        RuntimeException exception =
-                new RuntimeException(
-                        "model failed"
-                );
-
-
-        invocation.fail(
-                exception
-        );
-
+        invocation.fail(exception);
 
         assertEquals(
                 RuntimeInvocationStatus.FAILED,
-                invocation.status()
-        );
-
+                invocation.status());
 
         assertEquals(
                 exception,
-                invocation.failure()
-        );
-
+                invocation.failure());
     }
 }
