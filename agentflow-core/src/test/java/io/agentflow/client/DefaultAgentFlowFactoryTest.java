@@ -4,10 +4,8 @@ package io.agentflow.client;
 import io.agentflow.agent.Agent;
 import io.agentflow.agent.AgentExecutionFactory;
 import io.agentflow.agent.AgentRegistry;
-import io.agentflow.execution.Execution;
 import io.agentflow.execution.ExecutionEngine;
 import io.agentflow.execution.ExecutionResult;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -29,11 +27,11 @@ class DefaultAgentFlowFactoryTest {
 
                     }
 
-                    public Agent get(String id){
+                    public Agent get(String id) {
                         return null;
                     }
 
-                    public Collection<Agent> list(){
+                    public Collection<Agent> list() {
                         return List.of();
                     }
 

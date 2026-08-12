@@ -20,8 +20,7 @@ public class AgentTest {
         assertEquals("assistant", agent.name());
         assertEquals(
                 "You are a helpful assistant.",
-                agent.systemPrompt()
-        );
+                agent.systemPrompt());
     }
 
     @Test
@@ -30,13 +29,11 @@ public class AgentTest {
                 NullPointerException.class,
                 () -> Agent.builder()
                         .systemPrompt("You are helpful.")
-                        .build()
-        );
+                        .build());
 
         assertEquals(
                 "name must not be null",
-                exception.getMessage()
-        );
+                exception.getMessage());
     }
 
     @Test

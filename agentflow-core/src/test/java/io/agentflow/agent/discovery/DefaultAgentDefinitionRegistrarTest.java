@@ -28,12 +28,10 @@ public class DefaultAgentDefinitionRegistrarTest {
 
         registrar.register(
                 List.of(Assistant.class),
-                registry
-        );
+                registry);
 
         assertEquals(
                 "assistant",
-                registry.get("assistant").name()
-        );
+                registry.get("assistant").name());
     }
 }

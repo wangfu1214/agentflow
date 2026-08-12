@@ -19,13 +19,9 @@ class DefaultAgentDefinitionScannerTest {
     @Test
     void shouldCreateAgentFromAnnotation() {
 
-        AgentDefinitionScanner scanner =
-                new DefaultAgentDefinitionScanner();
+        AgentDefinitionScanner scanner = new DefaultAgentDefinitionScanner();
 
-        List<Agent> agents =
-                List.copyOf(
-                        scanner.scan(
-                                List.of(AssistantAgent.class)));
+        List<Agent> agents = List.copyOf(scanner.scan(List.of(AssistantAgent.class)));
 
         assertEquals(1, agents.size());
         Agent agent = agents.get(0);

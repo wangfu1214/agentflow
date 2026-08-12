@@ -21,40 +21,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultExecutionEngineToolTest {
 
-    private static final ExecutionDefinition DEFINITION =
-            new ExecutionDefinition(
-                    "assistant",
-                    "You are helpful.",
-                    "query order",
-                    List.of()
-            );
+    private static final ExecutionDefinition DEFINITION = new ExecutionDefinition(
+            "assistant",
+            "You are helpful.",
+            "query order",
+            List.of());
 
     @Test
     void shouldExecuteToolAndCompleteExecution() {
 
-        ToolDefinition toolDefinition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order");
+        ToolDefinition toolDefinition = new ToolDefinition(
+                "order-query",
+                "query order");
 
-        ToolInvoker toolInvoker =
-                (definition, arguments) ->
-                        "order-result";
+        ToolInvoker toolInvoker = (definition, arguments) -> "order-result";
 
-        ToolExecutionStep toolStep =
-                new ToolExecutionStep(
-                        toolDefinition,
-                        toolInvoker);
+        ToolExecutionStep toolStep = new ToolExecutionStep(
+                toolDefinition,
+                toolInvoker);
 
         ExecutionEngine engine = createEngine(toolStep);
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION);
+        Execution execution = new Execution(
+                "execution-001",
+                DEFINITION);
 
-        ExecutionResult result =
-                engine.execute(execution);
+        ExecutionResult result = engine.execute(execution);
 
         assertEquals(
                 "order-result",
@@ -68,25 +60,21 @@ class DefaultExecutionEngineToolTest {
     @Test
     void shouldFailExecutionWhenToolFails() {
 
-        ToolDefinition toolDefinition =
-                new ToolDefinition(
-                        "order-query",
-                        "query order");
+        ToolDefinition toolDefinition = new ToolDefinition(
+                "order-query",
+                "query order");
 
         ToolInvoker toolInvoker =
                 (definition, arguments) -> {
-
                     throw new RuntimeException("tool unavailable");
                 };
 
-        ExecutionEngine engine =
-                createEngine(
-                        new ToolExecutionStep(
-                                toolDefinition,
-                                toolInvoker));
+        ExecutionEngine engine = createEngine(
+                new ToolExecutionStep(
+                        toolDefinition,
+                        toolInvoker));
 
-        Execution execution =
-                new Execution("execution-001", DEFINITION);
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         RuntimeException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
@@ -105,18 +93,16 @@ class DefaultExecutionEngineToolTest {
 
     private ExecutionEngine createEngine(ToolExecutionStep step) {
 
-        ExecutionPipeline pipeline =
-                new DefaultExecutionPipeline(List.of(step));
+        ExecutionPipeline pipeline = new DefaultExecutionPipeline(List.of(step));
 
-        ExecutionEnvironment environment =
-                new DefaultExecutionEnvironment(
-                        new DefaultExecutionContextFactory(),
-                        new NoopExecutionLifecycle(),
-                        new ExecutionInterceptorChain(
-                                List.of()
-                        ),
-                        pipeline,
-                        new DefaultExecutionResultHandler());
+        ExecutionEnvironment environment = new DefaultExecutionEnvironment(
+                new DefaultExecutionContextFactory(),
+                new NoopExecutionLifecycle(),
+                new ExecutionInterceptorChain(
+                        List.of()
+                ),
+                pipeline,
+                new DefaultExecutionResultHandler());
         return new DefaultExecutionEngine(environment);
     }
 

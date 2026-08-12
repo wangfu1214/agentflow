@@ -44,8 +44,7 @@ class ExecutionLifecycleCoordinatorTest {
             }
         };
 
-        ExecutionPipeline pipeline = context -> {
-        };
+        ExecutionPipeline pipeline = context -> {};
 
         ExecutionResultHandler handler = context -> ExecutionResult.of("success");
 

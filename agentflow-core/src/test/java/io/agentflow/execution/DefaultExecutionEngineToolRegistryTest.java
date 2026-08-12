@@ -12,7 +12,9 @@ import io.agentflow.tool.ToolDefinition;
 import io.agentflow.tool.ToolInvoker;
 import io.agentflow.tool.ToolRegistry;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultExecutionEngineToolRegistryTest {
@@ -36,30 +38,27 @@ class DefaultExecutionEngineToolRegistryTest {
 
         ToolBinding binding = registry.get("order-query");
 
-        ToolExecutionStep step =
-                new ToolExecutionStep(
-                        binding.definition(),
-                        binding.invoker());
+        ToolExecutionStep step = new ToolExecutionStep(
+                binding.definition(),
+                binding.invoker());
 
         DefaultExecutionPipeline pipeline = new DefaultExecutionPipeline(List.of(step));
 
-        DefaultExecutionEngine engine =
-                new DefaultExecutionEngine(
-                        new DefaultExecutionEnvironment(
-                                new DefaultExecutionContextFactory(),
-                                new NoopExecutionLifecycle(),
-                                new ExecutionInterceptorChain(List.of()),
-                                pipeline,
-                                new DefaultExecutionResultHandler()));
+        DefaultExecutionEngine engine = new DefaultExecutionEngine(
+                new DefaultExecutionEnvironment(
+                        new DefaultExecutionContextFactory(),
+                        new NoopExecutionLifecycle(),
+                        new ExecutionInterceptorChain(List.of()),
+                        pipeline,
+                        new DefaultExecutionResultHandler()));
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        new ExecutionDefinition(
-                                "assistant",
-                                "system",
-                                "query order",
-                                List.of()));
+        Execution execution = new Execution(
+                "execution-001",
+                new ExecutionDefinition(
+                        "assistant",
+                        "system",
+                        "query order",
+                        List.of()));
 
         ExecutionResult result = engine.execute(execution);
 

@@ -33,4 +33,21 @@ public class DefaultAgentExecutionFactoryTest {
                 execution.definition()
         );
     }
+
+    @Test
+    void shouldSnapshotRequiredTools() {
+        Agent agent =
+                Agent.builder()
+                        .name("assistant")
+                        .systemPrompt("help")
+                        .requiredTools(List.of("order-query"))
+                        .build();
+        ExecutionFactory factory = new DefaultExecutionFactory(new UuidExecutionIdGenerator());
+        ExecutionDefinition definition = new ExecutionDefinition(
+                "agent-1", "test", "hello", agent.requiredTools());
+        Execution execution = factory.create(definition);
+        assertEquals(
+                agent.requiredTools(),
+                execution.definition().requiredTools());
+    }
 }

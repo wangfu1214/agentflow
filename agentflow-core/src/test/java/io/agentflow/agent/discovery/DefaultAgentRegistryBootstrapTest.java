@@ -23,21 +23,17 @@ class DefaultAgentRegistryBootstrapTest {
     @Test
     void shouldCreateRegistryFromAgentClasses() {
 
-        AgentDefinitionScanner scanner =
-                new DefaultAgentDefinitionScanner();
+        AgentDefinitionScanner scanner = new DefaultAgentDefinitionScanner();
 
-        AgentDefinitionRegistrar registrar =
-                new DefaultAgentDefinitionRegistrar(scanner);
+        AgentDefinitionRegistrar registrar = new DefaultAgentDefinitionRegistrar(scanner);
 
         AgentRegistryBootstrap bootstrap = new DefaultAgentRegistryBootstrap(registrar);
 
         AgentRegistry registry =
                 bootstrap.initialize(
-                        List.of(
-                                AssistantAgent.class));
+                        List.of(AssistantAgent.class));
 
-        Agent agent =
-                registry.get("assistant");
+        Agent agent = registry.get("assistant");
         assertEquals("assistant", agent.name());
         assertEquals("You are helpful", agent.systemPrompt());
     }

@@ -11,115 +11,80 @@ import io.agentflow.execution.result.DefaultExecutionResultHandler;
 import io.agentflow.model.ModelInvoker;
 import io.agentflow.model.ModelResponse;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DefaultExecutionEngineTest {
 
-    private static final ExecutionDefinition DEFINITION =
-            new ExecutionDefinition(
-                    "assistant",
-                    "You are helpful.",
-                    "Hello",
-                    List.of()
-            );
+    private static final ExecutionDefinition DEFINITION = new ExecutionDefinition(
+            "assistant",
+            "You are helpful.",
+            "Hello",
+            List.of());
 
     @Test
     void shouldExecuteModelAndCompleteExecution() {
         ModelInvoker modelInvoker = request -> {
             assertEquals(
                     "You are helpful.",
-                    request.systemPrompt()
-            );
+                    request.systemPrompt());
             assertEquals(
                     "Hello",
-                    request.input()
-            );
+                    request.input());
 
-            return ModelResponse.of(
-                    "Hello from model"
-            );
+            return ModelResponse.of("Hello from model");
         };
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionEngine engine = createEngine(modelInvoker);
 
-        ExecutionResult result =
-                engine.execute(execution);
+        ExecutionResult result = engine.execute(execution);
 
         assertEquals(
                 "Hello from model",
-                result.content()
-        );
+                result.content());
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
-                execution.status()
-        );
+                execution.status());
     }
 
     @Test
     void shouldMarkExecutionFailedWhenModelFails() {
-        RuntimeException modelFailure =
-                new RuntimeException("model unavailable");
+        RuntimeException modelFailure = new RuntimeException("model unavailable");
 
         ModelInvoker modelInvoker = request -> {
             throw modelFailure;
         };
-
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionEngine engine = createEngine(modelInvoker);
 
         RuntimeException thrown = assertThrows(
-                RuntimeException.class,
-                () -> engine.execute(execution)
-        );
-
+                RuntimeException.class, () -> engine.execute(execution));
         assertEquals(modelFailure, thrown);
-        assertEquals(
-                ExecutionStatus.FAILED,
-                execution.status()
-        );
+        assertEquals(ExecutionStatus.FAILED, execution.status());
     }
 
     @Test
     void shouldRejectNullModelResponse() {
-        ModelInvoker modelInvoker =
-                request -> null;
+        ModelInvoker modelInvoker = request -> null;
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionEngine engine = createEngine(modelInvoker);
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> engine.execute(execution)
-        );
+                () -> engine.execute(execution));
 
         assertEquals(
                 "modelInvoker returned null response",
-                exception.getMessage()
-        );
+                exception.getMessage());
         assertEquals(
                 ExecutionStatus.FAILED,
-                execution.status()
-        );
+                execution.status());
     }
 
     @Test
@@ -127,11 +92,7 @@ public class DefaultExecutionEngineTest {
         ModelInvoker modelInvoker =
                 request -> ModelResponse.of("done");
 
-        Execution execution =
-                new Execution(
-                        "execution-001",
-                        DEFINITION
-                );
+        Execution execution = new Execution("execution-001", DEFINITION);
 
         ExecutionEngine engine = createEngine(modelInvoker);
 
@@ -139,39 +100,26 @@ public class DefaultExecutionEngineTest {
 
         IllegalStateException exception = assertThrows(
                 IllegalStateException.class,
-                () -> engine.execute(execution)
-        );
+                () -> engine.execute(execution));
 
         assertEquals(
                 "expected execution status CREATED but was SUCCEEDED",
-                exception.getMessage()
-        );
+                exception.getMessage());
         assertEquals(
                 ExecutionStatus.SUCCEEDED,
-                execution.status()
-        );
+                execution.status());
     }
 
-    private ExecutionEngine createEngine(
-            ModelInvoker modelInvoker
-    ) {
+    private ExecutionEngine createEngine(ModelInvoker modelInvoker) {
 
-        ExecutionPipeline pipeline =
-                new DefaultExecutionPipeline(
-                        List.of(
-                                new ModelExecutionStep(
-                                        modelInvoker
-                                )
-                        )
-                );
-        ExecutionEnvironment environment =
-                new DefaultExecutionEnvironment(
-                        new DefaultExecutionContextFactory(),
-                        new NoopExecutionLifecycle(),
-                        new ExecutionInterceptorChain(List.of()),
-                        pipeline,
-                        new DefaultExecutionResultHandler()
-                );
+        ExecutionPipeline pipeline = new DefaultExecutionPipeline(
+                List.of(new ModelExecutionStep(modelInvoker)));
+        ExecutionEnvironment environment = new DefaultExecutionEnvironment(
+                new DefaultExecutionContextFactory(),
+                new NoopExecutionLifecycle(),
+                new ExecutionInterceptorChain(List.of()),
+                pipeline,
+                new DefaultExecutionResultHandler());
 
         return new DefaultExecutionEngine(environment);
     }
