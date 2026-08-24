@@ -4,8 +4,6 @@ import io.agentflow.agent.AgentExecutionFactory;
 import io.agentflow.agent.AgentRegistry;
 import io.agentflow.agent.DefaultAgentExecutionFactory;
 import io.agentflow.agent.DefaultAgentRegistry;
-import io.agentflow.autoconfigure.agent.AgentRegistrar;
-import io.agentflow.autoconfigure.agent.AgentScanner;
 import io.agentflow.autoconfigure.agent.SpringAgentDefinitionScanner;
 import io.agentflow.autoconfigure.agent.SpringAgentRegistrar;
 import io.agentflow.autoconfigure.extension.ExtensionRegistrar;
@@ -48,7 +46,7 @@ public class AgentFlowAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnBean(ExecutionEngine.class)
+    @ConditionalOnBean(ModelInvoker.class)
     public AgentFlow agentFlow(AgentRegistry agentRegistry,
                                AgentExecutionFactory agentExecutionFactory,
                                ExecutionEngine executionEngine) {
@@ -71,8 +69,8 @@ public class AgentFlowAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnBean(ModelInvoker.class)
     @ConditionalOnMissingBean
-    @ConditionalOnBean(ExecutionEnvironment.class)
     public ExecutionEngine executionEngine(ExecutionEnvironment environment) {
         return new DefaultExecutionEngine(environment);
     }
@@ -102,15 +100,6 @@ public class AgentFlowAutoConfiguration {
         return new DefaultAgentRegistry();
     }
 
-    @Bean
-    AgentScanner agentScanner() {
-        return new AgentScanner();
-    }
-
-    @Bean
-    AgentRegistrar agentRegistrar() {
-        return new AgentRegistrar();
-    }
 
     @Bean
     SpringAgentDefinitionScanner springAgentDefinitionScanner(ApplicationContext context) {
