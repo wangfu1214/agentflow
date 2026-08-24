@@ -12,24 +12,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExtensionRegistryTest {
 
-    private final ApplicationContextRunner contextRunner =
-            new ApplicationContextRunner().withUserConfiguration(
-                    TestConfiguration.class, ExtensionTestConfiguration.class);
-
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            .withUserConfiguration(TestConfiguration.class, ExtensionTestConfiguration.class);
 
     @Test
     void shouldRegisterExtension() {
 
         contextRunner.run(context -> {
-            ExtensionScanner scanner =
-                    context.getBean(ExtensionScanner.class);
+            ExtensionScanner scanner = context.getBean(ExtensionScanner.class);
 
-            ExtensionRegistry registry =
-                    context.getBean(ExtensionRegistry.class);
+            ExtensionRegistry registry = context.getBean(ExtensionRegistry.class);
 
-            System.out.println(
-                    "extensions = " + scanner.scan()
-            );
+            System.out.println("extensions = " + scanner.scan());
 
             assertThat(registry.contains("mock-extension"))
                     .isTrue();
@@ -39,10 +33,8 @@ public class ExtensionRegistryTest {
         });
     }
 
-
     @Configuration
     static class TestConfiguration {
-
         @Bean
         MockExtension mockExtension() {
             return new MockExtension();
@@ -58,20 +50,15 @@ public class ExtensionRegistryTest {
         }
 
         @Bean
-        ExtensionScanner extensionScanner(
-                ApplicationContext context) {
+        ExtensionScanner extensionScanner(ApplicationContext context) {
 
             return new ExtensionScanner(context);
         }
 
         @Bean
-        ExtensionRegistrar extensionRegistrar(
-                ExtensionScanner scanner,
-                ExtensionRegistry registry) {
+        ExtensionRegistrar extensionRegistrar(ExtensionScanner scanner, ExtensionRegistry registry) {
 
-            return new ExtensionRegistrar(
-                    scanner, registry
-            );
+            return new ExtensionRegistrar(scanner, registry);
         }
     }
 

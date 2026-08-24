@@ -7,6 +7,7 @@ import io.agentflow.agent.DefaultAgentRegistry;
 import io.agentflow.autoconfigure.agent.AgentRegistrar;
 import io.agentflow.autoconfigure.agent.AgentScanner;
 import io.agentflow.autoconfigure.agent.SpringAgentDefinitionScanner;
+import io.agentflow.autoconfigure.agent.SpringAgentRegistrar;
 import io.agentflow.autoconfigure.extension.ExtensionRegistrar;
 import io.agentflow.autoconfigure.extension.ExtensionScanner;
 import io.agentflow.client.AgentFlow;
@@ -23,6 +24,7 @@ import io.agentflow.execution.pipeline.ModelExecutionStep;
 import io.agentflow.execution.result.DefaultExecutionResultHandler;
 import io.agentflow.extension.ExtensionRegistry;
 import io.agentflow.model.ModelInvoker;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -128,4 +130,14 @@ public class AgentFlowAutoConfiguration {
                 new DefaultExecutionResultHandler());
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public SpringAgentRegistrar springAgentRegistrar(AgentRegistry agentRegistry) {
+        return new SpringAgentRegistrar(agentRegistry);
+    }
+
+    @Bean
+    public SmartInitializingSingleton agentRegistrationInitializer(SpringAgentDefinitionScanner scanner, SpringAgentRegistrar registrar) {
+        return () -> registrar.register(scanner.scan());
+    }
 }
